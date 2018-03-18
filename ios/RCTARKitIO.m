@@ -35,8 +35,9 @@
 - (SCNNode *)loadModel:(NSString *)path nodeName:(NSString *)nodeName withAnimation:(BOOL)withAnimation {
     NSURL *url = [self urlFromPath:path];
     NSError* error;
-    
-    SCNScene *scene = [SCNScene sceneWithURL:url options:nil error:&error];
+  
+  NSDictionary *opts = @{SCNSceneSourceConvertToYUpKey: @YES, SCNSceneSourceConvertUnitsToMetersKey: @1.0};
+  SCNScene *scene = [SCNScene sceneWithURL:url options:opts error:&error];
     if(error) {
         NSLog(@"%@",[error localizedDescription]);
     }

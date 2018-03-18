@@ -62,6 +62,33 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property node:(SCNNode *)node frame:(NSS
             }
             
         }
+      SCNVector3 initialPos = modelNode.position;
+      SCNVector3 min = SCNVector3Zero;
+      SCNVector3 max = SCNVector3Zero;
+      [modelNode getBoundingBoxMin:&min max:&max];
+      
+      modelNode.pivot = SCNMatrix4MakeTranslation(
+                                             min.x + (max.x - min.x)/2,
+                                             min.y + (max.y - min.y)/2,
+                                             min.z + (max.z - min.z)/2
+      );
+      float correctX = (min.x + (max.x - min.x)/2);
+      float correctY = -min.y;//(min.y + (max.y - min.y)/2);
+      float correctZ = (min.z + (max.z - min.z)/2);
+      
+      
+      if ([modelNode convertVector:SCNVector3Make(0,0,1) fromNode:node].z < 0 ){
+        // if blue local z-axis is pointing downwards
+        modelNode.position = SCNVector3Make(initialPos.x - correctX, initialPos.y - correctY, initialPos.z - correctZ);
+      } else {
+        // if blue local z-axis is pointing upwards
+        modelNode.position = SCNVector3Make(initialPos.x + correctX, initialPos.y + correctY, initialPos.z + correctZ);
+      }
+      
+      SCNMatrix4 flip = modelNode.transform;
+      flip.m33 *= -1;
+      modelNode.transform = flip;
+      
         [node addChildNode:modelNode];
         //NSLog(@"load model finished: %@", node.name);
     });
