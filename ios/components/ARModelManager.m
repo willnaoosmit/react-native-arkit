@@ -27,31 +27,31 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property node:(SCNNode *)node frame:(NSS
             // deprecated
             scale = [model[@"scale"] floatValue];
         }
-        
+
         NSString *path = [NSString stringWithFormat:@"%@", model[@"file"]];
         //NSLog(@"mounting model: %@ %@", node.name, path);
         SCNNode *modelNode = [[RCTARKitIO sharedInstance] loadModel:path nodeName:model[@"node"] withAnimation:YES];
         modelNode.scale = SCNVector3Make(scale, scale, scale);
         // transfer some properties to modeNode like "castsShadow"
         modelNode.castsShadow = node.castsShadow;
-        
-        
+
+
         NSDictionary* materialJson;
         if(property[@"material"] ) {
             materialJson = property[@"material"];
         }
-        
-        
+
+
         if(materialJson) {
             for(id idx in modelNode.geometry.materials) {
                 SCNMaterial* material = (SCNMaterial* )idx;
                 [RCTConvert setMaterialProperties:material properties:materialJson];
             }
         }
-        
+
         for(id idx in modelNode.childNodes) {
             // iterate over all childnodes and apply shaders
-            
+
             SCNNode* childNode = (SCNNode *)idx;
             childNode.castsShadow = node.castsShadow;
             if(materialJson) {
@@ -60,40 +60,31 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property node:(SCNNode *)node frame:(NSS
                     [RCTConvert setMaterialProperties:material properties:materialJson];
                 }
             }
-            
+
         }
-      SCNVector3 initialPos = modelNode.position;
+
       SCNVector3 min = SCNVector3Zero;
       SCNVector3 max = SCNVector3Zero;
       [modelNode getBoundingBoxMin:&min max:&max];
-      
-      modelNode.pivot = SCNMatrix4MakeTranslation(
-                                             min.x + (max.x - min.x)/2,
-                                             min.y + (max.y - min.y)/2,
-                                             min.z + (max.z - min.z)/2
-      );
-      float correctX = (min.x + (max.x - min.x)/2);
-      float correctY = -min.y;//(min.y + (max.y - min.y)/2);
-      float correctZ = (min.z + (max.z - min.z)/2);
-      
-      
-      if ([modelNode convertVector:SCNVector3Make(0,0,1) fromNode:node].z < 0 ){
-        // if blue local z-axis is pointing downwards
-        modelNode.position = SCNVector3Make(initialPos.x - correctX, initialPos.y - correctY, initialPos.z - correctZ);
-      } else {
-        // if blue local z-axis is pointing upwards
-        modelNode.position = SCNVector3Make(initialPos.x + correctX, initialPos.y + correctY, initialPos.z + correctZ);
-      }
-      
+
+      // flip the z to face us
       SCNMatrix4 flip = modelNode.transform;
       flip.m33 *= -1;
       modelNode.transform = flip;
-      
+
+      // positions the model sitting just above the plane or position it was set to and center
+      // x and z of its bounding box for rotations, scaling, etc.
+      modelNode.pivot = SCNMatrix4MakeTranslation(
+                                                  min.x + (max.x - min.x)/2,
+                                                  min.y,
+                                                  min.z + (max.z - min.z)/2
+                                                  );
+
         [node addChildNode:modelNode];
         //NSLog(@"load model finished: %@", node.name);
     });
-    
-    
+
+
 }
 
 @end
