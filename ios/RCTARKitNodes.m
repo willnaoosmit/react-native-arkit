@@ -345,20 +345,33 @@ static id ObjectOrNull(id object)
     }
 }
 
+- (void) setChildrenMaterial:(SCNNode*)node
+                  properties:(NSDictionary *) properties {
+  bool setMaterial = false;
+  for (SCNNode* child in node.childNodes) {
+    for (id material in child.geometry.materials) {
+      [RCTConvert setMaterialProperties:material properties:properties[@"material"]];
+      setMaterial = true;
+    }
+    if( !setMaterial ){
+      [self setChildrenMaterial:child properties:properties];
+    }
+  }
+}
+
 - (bool)updateNode:(NSString *)nodeId
         properties:(NSDictionary *) properties {
     
     SCNNode *node = [self getNodeWithId:nodeId];
-    //NSLog(@"updating node %@ :%@", nodeId, properties);
+    // NSLog(@"updating node %@ :%@", nodeId, properties);
     if(node) {
         [RCTConvert setNodeProperties:node properties:properties];
         if(node.geometry && properties[@"shape"]) {
             [RCTConvert setShapeProperties:node.geometry properties:properties[@"shape"]];
         }
         if(properties[@"material"]) {
-            for (id material in node.geometry.materials) {
-                [RCTConvert setMaterialProperties:material properties:properties[@"material"]];
-            }
+          // The node we are looking at might not have the props, so lets ask all the children to update too please
+          [self setChildrenMaterial:node properties:properties];
         }
         if(node.light) {
             [RCTConvert setLightProperties:node.light properties:properties];
