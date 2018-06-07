@@ -138,7 +138,15 @@ export default (mountConfig, propTypes = {}, nonUpdateablePropKeys = []) => {
     }
 
     async mountWithProps(props) {
-      return mount(this.identifier, props, this.context.arkitParentId);
+      return new Promise((resolve, reject) => {
+        mount(this.identifier, props, this.context.arkitParentId)
+        .then(()=>{
+          if(props.onFinishedLoading){
+            props.onFinishedLoading();
+          }
+          resolve();
+        }).catch(reject);
+      });
     }
 
     componentWillUpdate(props) {
