@@ -15,7 +15,13 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(mount:(NSDictionary *)property node:(SCNNode *)node frame:(NSString *)frame parentId:(NSString *)parentId) {
+RCT_EXPORT_METHOD(mount:(NSDictionary *)property
+                  node:(SCNNode *)node
+                  frame:(NSString *)frame
+                  parentId:(NSString *)parentId
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject
+                  ) {
     //NSLog(@"mounting node: %@ ", node.name);
     // we need to mount first, otherwise, if the loading of the model is slow, it will be registered too late
     [[RCTARKitNodes sharedInstance] addNodeToScene:node inReferenceFrame:frame withParentId:parentId];
@@ -82,6 +88,7 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property node:(SCNNode *)node frame:(NSS
 
         [node addChildNode:modelNode];
         //NSLog(@"load model finished: %@", node.name);
+      resolve(nil);
     });
 
 
