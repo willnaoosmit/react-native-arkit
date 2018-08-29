@@ -9,6 +9,8 @@
 #import "ARGeosManager.h"
 #import "RCTARKitNodes.h"
 
+typedef SCNNode SCNLine;
+
 @implementation ARGeosManager
 
 RCT_EXPORT_MODULE()
@@ -75,6 +77,13 @@ RCT_EXPORT_METHOD(addPlane:(SCNPlane *)geometry node:(SCNNode *)node frame:(NSSt
 
 RCT_EXPORT_METHOD(addShape:(SCNShape *)geometry node:(SCNNode *)node frame:(NSString *)frame parentId:(NSString *)parentId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     node.geometry = geometry;
+    [[RCTARKitNodes sharedInstance] addNodeToScene:node inReferenceFrame:frame withParentId:parentId];
+    resolve(nil);
+}
+
+RCT_EXPORT_METHOD(addLine:(SCNLine *)line node:(SCNNode *)node frame:(NSString *)frame parentId:(NSString *)parentId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    //node.geometry = geometry;
+  [node addChildNode: line];
     [[RCTARKitNodes sharedInstance] addNodeToScene:node inReferenceFrame:frame withParentId:parentId];
     resolve(nil);
 }

@@ -11,6 +11,8 @@
 #import <React/RCTConvert.h>
 #import <ARKit/ARKit.h>
 
+#import "SCNLine.h"
+
 @interface SCNTextNode : SCNNode
 @end
 
@@ -33,6 +35,7 @@
 + (SCNCapsule *)SCNCapsule:(id)json;
 + (SCNPlane *)SCNPlane:(id)json;
 + (SCNShape * )SCNShape:(id)json;
++ (SCNLine * )SCNLine:(id)json;
 + (SCNLight *)SCNLight:(id)json;
 
 + (SCNTextNode *)SCNTextNode:(id)json;

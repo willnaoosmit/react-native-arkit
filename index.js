@@ -16,6 +16,7 @@ import ARModel from './components/ARModel';
 import ARPlane from './components/ARPlane';
 import ARPyramid from './components/ARPyramid';
 import ARShape from './components/ARShape';
+import ARLine from './components/ARLine';
 import ARSphere from './components/ARSphere';
 import ARSprite from './components/ARSprite';
 import ARText from './components/ARText';
@@ -41,6 +42,7 @@ ARKit.Model = ARModel;
 ARKit.Sprite = ARSprite;
 ARKit.Group = ARGroup;
 ARKit.Shape = ARShape;
+ARKit.Line = ARLine;
 ARKit.Light = ARLight;
 
 startup();
