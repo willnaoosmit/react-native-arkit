@@ -266,6 +266,9 @@
 
     // TODO get radius from shape.thickness
     float radius = 0.01;
+    if( shape[@"thickness"] ) {
+        radius = [shape[@"thickness"] floatValue];
+    }
     float length = GLKVector3Distance(SCNVector3ToGLKVector3(positions[0]), SCNVector3ToGLKVector3(positions[1]));
 
     SCNCylinder* cyl = [SCNCylinder cylinderWithRadius:radius height:length];
@@ -350,6 +353,8 @@
 
     // SCNTextNode
     SCNTextNode *textNode = [SCNNode nodeWithGeometry:scnText];
+
+  if( textNode != nil) {
     textNode.name = [NSString stringWithFormat:@"%@", json[@"id"]];
 
 
@@ -363,7 +368,7 @@
     textNode.position = SCNVector3Make(-(min.x + max.x) / 2 * size,
                                        -(min.y + max.y) / 2 * size,
                                        -(min.z + max.z) / 2 * size);
-
+  }
     return textNode;
 }
 
