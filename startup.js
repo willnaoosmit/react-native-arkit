@@ -11,5 +11,7 @@ export default () => {
     if (isInitialized) {
       ARKitManager.clearScene();
     }
+  }).catch((err) => {
+    console.log(err)
   });
 };
