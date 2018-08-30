@@ -138,6 +138,7 @@ export const material = PropTypes.shape({
   transparencyMode,
   lightingModel,
   shaders,
+  readsFromDepthBuffer: PropTypes.bool,
   writesToDepthBuffer: PropTypes.bool,
   colorBufferWriteMask,
   doubleSided: PropTypes.bool,

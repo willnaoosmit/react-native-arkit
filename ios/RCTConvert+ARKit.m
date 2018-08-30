@@ -502,6 +502,10 @@
         material.shaderModifiers = json[@"shaders"];
     }
 
+    if(json[@"readsFromDepthBuffer"] ) {
+        material.readsFromDepthBuffer = [json[@"readsFromDepthBuffer"] boolValue];
+    }
+
     if(json[@"writesToDepthBuffer"] ) {
         material.writesToDepthBuffer = [json[@"writesToDepthBuffer"] boolValue];
     }
