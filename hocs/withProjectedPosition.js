@@ -77,6 +77,8 @@ export default ({ throttleMs = 33, overwritePosition = {} } = {}) => C =>
               ? plane(results)
               : results.find(r => r.id === plane);
             this.onResult(result);
+          }).catch((err)=>{
+            console.log(err);
           });
         } else if (node) {
           ARKitManager.hitTestSceneObjects({ x, y }).then(({ results }) => {
@@ -84,6 +86,8 @@ export default ({ throttleMs = 33, overwritePosition = {} } = {}) => C =>
               ? node(results)
               : results.find(r => r.id === node);
             this.onResult(result);
+          }).catch((err)=>{
+            console.log(err);
           });
         }
       }
