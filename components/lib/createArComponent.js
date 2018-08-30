@@ -131,6 +131,8 @@ export default (mountConfig, propTypes = {}, nonUpdateablePropKeys = []) => {
         this.mountWithProps(fullPropsOnMount).then(() => {
           this.props = propsOnMount;
           this.componentWillUpdate({ ...props, transition: transitionOnMount });
+        }).catch((err)=>{
+          console.log(err)
         });
       } else {
         this.mountWithProps(props);
@@ -145,7 +147,10 @@ export default (mountConfig, propTypes = {}, nonUpdateablePropKeys = []) => {
             props.onFinishedLoading();
           }
           resolve();
-        }).catch(reject);
+        }).catch((err)=>{
+          console.log(err)
+          reject(err)
+        });
       });
     }
 
