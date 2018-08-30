@@ -203,7 +203,9 @@ ARKit.snapshotCamera = addDefaultsToSnapShotFunc('snapshotCamera');
 ARKit.exportModel = presetId => {
   const id = presetId || generateId();
   const property = { id };
-  return ARKitManager.exportModel(property).then(result => ({ ...result, id }));
+  return ARKitManager.exportModel(property).then(result => ({ ...result, id })).catch((err)=>{
+    console.log(err)
+  });
 };
 
 ARKit.TRACKING_STATES = TRACKING_STATES
