@@ -206,6 +206,10 @@ ARKit.exportModel = presetId => {
   return ARKitManager.exportModel(property).then(result => ({ ...result, id }));
 };
 
+ARKit.TRACKING_STATES = TRACKING_STATES
+ARKit.TRACKING_REASONS = TRACKING_REASONS
+ARKit.TRACKING_STATES_COLOR = TRACKING_STATES_COLOR
+
 ARKit.pickColors = pickColors;
 ARKit.pickColorsFromFile = pickColorsFromFile;
 ARKit.propTypes = {
