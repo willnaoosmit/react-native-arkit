@@ -204,6 +204,20 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
     return position;
 }
 
+- (SCNVector3)getRelativePositionToGroup:(const SCNVector3)positionAbsolute :(NSString*) groupName {
+  SCNVector3 originPosition = self.localOrigin.position;
+  SCNVector3 position = SCNVector3Make(positionAbsolute.x - originPosition.x, positionAbsolute.y- originPosition.y, positionAbsolute.z - originPosition.z);
+  SCNNode *node = self.nodes[groupName];
+  if( node != nil ) {
+    GLKVector3 posVec = SCNVector3ToGLKVector3(position);
+    GLKMatrix4 transform = SCNMatrix4ToGLKMatrix4(node.transform);
+    transform = GLKMatrix4Invert(transform, nil);
+    posVec = GLKMatrix4MultiplyVector3(transform, posVec);
+    position = SCNVector3FromGLKVector3(posVec);
+  }
+  return position;
+}
+
 - (SCNVector3)getAbsolutePositionToOrigin:(const SCNVector3)positionRelative {
     SCNVector3 originPosition = self.localOrigin.position;
     SCNVector3 position = SCNVector3Make(positionRelative.x + originPosition.x, positionRelative.y+ originPosition.y, positionRelative.z + originPosition.z);
@@ -225,9 +239,11 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
             
             SCNVector3 positionAbsolute = result.worldCoordinates;
             SCNVector3 position = [self getRelativePositionToOrigin:positionAbsolute];
+            // TODO: allow passing in of relative group name
+            SCNVector3 positionGroup = [self getRelativePositionToGroup:result.worldCoordinates :@"ARMainGroup"];
             SCNVector3 normal = result.worldNormal;
             float distance = [self getCameraDistanceToPoint:positionAbsolute];
-            NSDictionary *result = @{
+            NSDictionary *resultDict = @{
                                      @"id": nodeId,
                                      @"distance": @(distance),
                                      @"positionAbsolute": @{
@@ -235,6 +251,11 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
                                              @"y": @(positionAbsolute.y),
                                              @"z": @(positionAbsolute.z)
                                              },
+                                     @"positionGroup": @{
+                                             @"x": @(positionGroup.x),
+                                             @"y": @(positionGroup.y),
+                                             @"z": @(positionGroup.z)
+                                            },
                                      @"position": @{
                                              @"x": @(position.x),
                                              @"y": @(position.y),
@@ -246,7 +267,7 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
                                              @"z": @(normal.z)
                                              }
                                      };
-            [resultsMapped addObject:(result )];
+            [resultsMapped addObject:(resultDict )];
         }
         
     }];
