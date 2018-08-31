@@ -243,7 +243,6 @@
     NSDictionary* shape = json[@"shape"];
 
     SCNNode * mainParentNode = [SCNNode node];
-    SCNGeometry *geometry;
 
     NSMutableArray* points = shape[@"points"];
     int pointCount = (int) points.count;
@@ -256,8 +255,7 @@
     SCNVector3 positions[pointCount];
     int indices[pointCount];
     for(int i = 0; i < pointCount; i++ ){
-        SCNVector3 position = [self SCNVector3:points[i][@"position"]];
-        positions[i] = position;
+        positions[i] = [self SCNVector3:points[i]];
         indices[i] = i;
     }
 
