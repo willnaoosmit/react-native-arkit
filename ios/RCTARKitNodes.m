@@ -209,11 +209,12 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
   SCNVector3 position = SCNVector3Make(positionAbsolute.x - originPosition.x, positionAbsolute.y- originPosition.y, positionAbsolute.z - originPosition.z);
   SCNNode *node = self.nodes[groupName];
   if( node != nil ) {
-    GLKVector3 posVec = SCNVector3ToGLKVector3(position);
+    // Need to use a Vec4 with a 1 in the w slot so that the translation gets applied
+    GLKVector4 posVec = GLKVector4Make(position.x, position.y, position.z, 1.0);
     GLKMatrix4 transform = SCNMatrix4ToGLKMatrix4(node.transform);
     transform = GLKMatrix4Invert(transform, nil);
-    posVec = GLKMatrix4MultiplyVector3(transform, posVec);
-    position = SCNVector3FromGLKVector3(posVec);
+    posVec = GLKMatrix4MultiplyVector4(transform, posVec);
+    position = SCNVector3Make(posVec.x, posVec.y, posVec.z);
   }
   return position;
 }
