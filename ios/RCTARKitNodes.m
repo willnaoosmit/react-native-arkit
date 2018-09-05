@@ -177,7 +177,8 @@ CGFloat focDistance = 0.2f;
     NSDictionary *options = @{
                               SCNHitTestRootNodeKey: self.localOrigin,
                               SCNHitTestSortResultsKey: @(YES),
-                              SCNHitTestOptionSearchMode: @(SCNHitTestSearchModeAll)
+                              //SCNHitTestOptionSearchMode: @(SCNHitTestSearchModeAll)
+                              SCNHitTestOptionSearchMode: @(SCNHitTestSearchModeClosest)
                               };
     NSArray<SCNHitTestResult *> *results = [_arView hitTest:tapPoint options:options];
     NSMutableArray * resultsMapped = [self mapHitResultsWithSceneResults:results];
@@ -352,8 +353,8 @@ static id ObjectOrNull(id object)
     
     SCNNode *node = [self getNodeWithId:nodeId];
     if (node) {
-        //NSLog(@"removing node: %@ ", key);
-     
+        NSLog(@"removing node: %@ ", nodeId);
+
         if(node.parentNode) {
             if(node.light) {
                 // see https://stackoverflow.com/questions/47270056/how-to-remove-a-light-with-shadowmode-deferred-in-scenekit-arkit?noredirect=1#comment81491270_47270056
