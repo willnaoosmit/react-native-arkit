@@ -82,6 +82,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (NSDictionary* )getCurrentLightEstimation;
 - (NSArray * )getCurrentDetectedFeaturePoints;
 - (bool)isMounted;
+- (bool)getNodeVisibility;
 - (void)addRendererDelegates:(id)delegate;
 - (void)removeRendererDelegates:(id)delegate;
 

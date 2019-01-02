@@ -393,6 +393,10 @@ RCT_EXPORT_METHOD(focusScene:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseR
     resolve(@{});
 }
 
+RCT_EXPORT_METHOD(checkNodeVisible:(NSString *)nodeId (RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    resolve([[ARKit sharedInstance] getNodeVisibility:nodeId]);
+}
+
 RCT_EXPORT_METHOD(clearScene:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     [[ARKit sharedInstance] clearScene];
     resolve(@{});

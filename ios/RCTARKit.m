@@ -296,6 +296,11 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
     
 }
 
+- (bool)getNodeVisibility:(NSString *)nodeId {
+  SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
+  return [self.arView isNodeInsideFrustum:node withPointOfView:self.arView.pointOfView];
+}
+
 
 
 #pragma mark - Lazy loads
