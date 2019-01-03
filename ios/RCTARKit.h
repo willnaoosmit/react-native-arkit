@@ -73,10 +73,12 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (void)hitTestSceneObjects:(CGPoint)tapPoint resolve:(RCTARKitResolve) resolve reject:(RCTARKitReject)reject;
 - (SCNVector3)projectPoint:(SCNVector3)point;
 - (float)getCameraDistanceToPoint:(SCNVector3)point;
+- (float)getDistanceBetweenPoints:(SCNVector3)point pointTwo:(SCNVector3)pointTwo;
 - (UIImage *)getSnapshot:(NSDictionary*)selection;
 - (UIImage *)getSnapshotCamera:(NSDictionary*)selection;
 - (void)focusScene;
 - (void)clearScene;
+- (void)moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId;
 - (NSDictionary *)readCameraPosition;
 - (NSDictionary *)readCamera;
 - (NSDictionary* )getCurrentLightEstimation;

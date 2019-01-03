@@ -372,6 +372,15 @@ RCT_EXPORT_METHOD(getCurrentDetectedFeaturePoints:(RCTPromiseResolveBlock)resolv
     resolve([[ARKit sharedInstance] getCurrentDetectedFeaturePoints]);
 }
 
+RCT_EXPORT_METHOD(getDistanceBetweenPoints:(NSDictionary *)pointDict pointTwoDict:(NSDictionary *)pointTwoDict resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  SCNVector3 point = SCNVector3Make(  [pointDict[@"x"] floatValue], [pointDict[@"y"] floatValue], [pointDict[@"z"] floatValue] );
+  SCNVector3 pointTwo = SCNVector3Make(  [pointTwoDict[@"x"] floatValue], [pointTwoDict[@"y"] floatValue], [pointTwoDict[@"z"] floatValue] );
+  float distance = [[ARKit sharedInstance] getDistanceBetweenPoints:point pointTwo:pointTwo];
+  
+  
+  resolve(@{@"distance": @(distance)});
+}
+
 RCT_EXPORT_METHOD(projectPoint:
                   (NSDictionary *)pointDict
                   resolve:(RCTPromiseResolveBlock)resolve
@@ -396,6 +405,11 @@ RCT_EXPORT_METHOD(focusScene:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseR
 RCT_EXPORT_METHOD(checkNodeVisible:(NSString *)nodeId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   BOOL nodeIsVisible = [[ARKit sharedInstance] getNodeVisibility:nodeId];
   resolve(@(nodeIsVisible));
+}
+
+RCT_EXPORT_METHOD(moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  [[ARKit sharedInstance] moveNodeToCamera:nodeId targetNodeId:targetNodeId];
+  resolve(@{});
 }
 
 RCT_EXPORT_METHOD(clearScene:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {

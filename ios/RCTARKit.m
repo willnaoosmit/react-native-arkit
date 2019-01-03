@@ -293,12 +293,33 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 - (float)getCameraDistanceToPoint:(SCNVector3)point {
     return [self.nodeManager getCameraDistanceToPoint:point];
-    
 }
+
+- (float)getDistanceBetweenPoints:(SCNVector3)point pointTwo:(SCNVector3)pointTwo {
+
+  return [self.nodeManager getDistanceBetweenPoints:point pointTwo:pointTwo];
+}
+
+//-(NSString *)sideClosestToNode:(NSString)nodeId {
+//  return
+//}
+
 
 - (bool)getNodeVisibility:(NSString *)nodeId {
   SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
   return [self.arView isNodeInsideFrustum:node withPointOfView:self.arView.pointOfView];
+}
+
+- (void)moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId {
+  SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
+  SCNNode *target = [self.nodeManager getNodeWithId:targetNodeId];
+  SCNLookAtConstraint *pointToNode = [SCNLookAtConstraint lookAtConstraintWithTarget:target];
+  pointToNode.gimbalLockEnabled = YES;
+  node.constraints = @[pointToNode];
+  
+//  node.position = SCNVector3Make(0, 0, -0.2);
+  [self.arView.pointOfView addChildNode:node];
+  [node lookAt:target.position];
 }
 
 
