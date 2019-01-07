@@ -297,7 +297,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 - (float)getDistanceBetweenPoints:(SCNVector3)point pointTwo:(SCNVector3)pointTwo {
 
-  return [self.nodeManager getDistanceBetweenPoints:point pointTwo:pointTwo];
+  return [self getDistanceBetweenPoints:point pointTwo:pointTwo];
 }
 
 //-(NSString *)sideClosestToNode:(NSString)nodeId {
