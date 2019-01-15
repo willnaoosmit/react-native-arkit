@@ -63,6 +63,10 @@ static RCTARKit *instance = nil;
 
 - (instancetype)initWithARView:(ARSCNView *)arView {
     if ((self = [super init])) {
+
+      self.sixDegressView = [[RCTARKitSixDegreesView alloc] init];
+      [self addSubview:self.sixDegressView];
+
         self.arView = arView;
         
         // delegates
@@ -93,6 +97,8 @@ static RCTARKit *instance = nil;
         arView.defaultCameraController.maximumVerticalAngle = 45;
         arView.defaultCameraController.inertiaEnabled = YES;
         [arView.defaultCameraController translateInCameraSpaceByX:(float) 0.0 Y:(float) 0.0 Z:(float) 3.0];
+#else
+      self.sixDegressView = [[RCTARKitSixDegreesView alloc] init];
         
         #endif
         // start ARKit
@@ -112,11 +118,11 @@ static RCTARKit *instance = nil;
 }
 
 - (void)pause {
-    [self.session pause];
+//    [self.session pause];
 }
 
 - (void)resume {
-    [self.session runWithConfiguration:self.configuration];
+//    [self.session runWithConfiguration:self.configuration];
 }
 
 - (void)session:(ARSession *)session didFailWithError:(NSError *)error {
@@ -129,9 +135,9 @@ static RCTARKit *instance = nil;
     
 }
 - (void)reset {
-    if (ARWorldTrackingConfiguration.isSupported) {
-        [self.session runWithConfiguration:self.configuration options:ARSessionRunOptionRemoveExistingAnchors | ARSessionRunOptionResetTracking];
-    }
+//    if (ARWorldTrackingConfiguration.isSupported) {
+//        [self.session runWithConfiguration:self.configuration options:ARSessionRunOptionRemoveExistingAnchors | ARSessionRunOptionResetTracking];
+//    }
 }
 
 - (void)focusScene {
