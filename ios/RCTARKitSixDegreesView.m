@@ -8,112 +8,10 @@
 
 #import "RCTARKitSixDegreesView.h"
 
+#import "RCTARSixDegreesMeshController.h"
+
 #import <SixDegreesSDK/SixDegreesSDK.h>
 #import <SixDegreesSDK/SixDegreesSDK_advanced.h>
-
-@interface MeshController : NSObject
-  - (void)update;
-
-  @property (readonly) SCNNode* meshNode;
-@end
-
-@interface MeshController () {
-  SCNMaterial* _meshMaterial;
-  int _meshVersion;
-}
-
-@end
-
-@implementation MeshController
-
-- (id)init {
-  self = [super init];
-  if (self) {
-    _meshNode = [SCNNode new];
-    [_meshNode setName:@"SixDegreesMesh"];
-    [_meshNode setRenderingOrder:-10];
-    _meshMaterial = [SCNMaterial new];
-    [_meshMaterial setDoubleSided:YES];
-    _meshMaterial.diffuse.contents = [UIColor colorWithWhite:0.6f alpha:0.5f];
-    //      _meshMaterial.writesToDepthBuffer = true;
-    //      _meshMaterial.readsFromDepthBuffer = true;
-    //      _meshMaterial.colorBufferWriteMask = SCNColorMaskNone;
-    //        [_meshMaterial setShaderModifiers:
-    //  @{ SCNShaderModifierEntryPointSurface:
-    //         @"float4 surfaceNormal = float4(_surface.normal, 0.0f);"
-    //     "float4 normal = scn_frame.inverseViewTransform * surfaceNormal;"
-    //     "_surface.diffuse.xyz = abs(normal.xyz);" }];
-    _meshVersion = -1;
-  }
-  return self;
-}
-
-- (void)update {
-  int blockBufferSize = 0;
-  int vertexBufferSize = 0;
-  int faceBufferSize = 0;
-  int newVersion = SixDegreesSDK_GetMeshBlockInfo(&blockBufferSize, &vertexBufferSize, &faceBufferSize);
-
-  if (newVersion > _meshVersion) {
-    if (blockBufferSize <= 0 ||
-        vertexBufferSize <= 0 ||
-        faceBufferSize <= 0) {
-      return;
-    }
-
-    int* blockBuffer = (int*)malloc(blockBufferSize*sizeof(int));
-    float* vertexBuffer = (float*)malloc(vertexBufferSize*sizeof(float));
-    int* faceBuffer = (int*)malloc(faceBufferSize*sizeof(int));
-
-    int fullBlocks = SixDegreesSDK_GetMeshBlocks(blockBuffer, vertexBuffer, faceBuffer,
-                                                 blockBufferSize, vertexBufferSize, faceBufferSize);
-    if (fullBlocks <= 0) {
-      NSLog(@"SixDegreesSDK_GetMeshBlocks() gave us an empty mesh, will not update.");
-      return;
-    }
-
-    if (fullBlocks != blockBufferSize / 6) {
-      NSLog(@"SixDegreesSDK_GetMeshBlocks() returned %d full blocks, expected %d", fullBlocks, (blockBufferSize / 6));
-    }
-
-    _meshVersion = newVersion;
-
-    int vertexCount = vertexBufferSize / 6;
-    SCNVector3* vertices = malloc(vertexCount*sizeof(SCNVector3));
-    SCNVector3* normals = malloc(vertexCount*sizeof(SCNVector3));
-    for (int i = 0; i < vertexCount; i++) {
-      vertices[i] = SCNVector3Make(vertexBuffer[6*i], vertexBuffer[6*i+1], vertexBuffer[6*i+2]);
-      normals[i] = SCNVector3Make(vertexBuffer[6*i+3], vertexBuffer[6*i+4], vertexBuffer[6*i+5]);
-    }
-    int faceCount = faceBufferSize / 3;
-    NSData* faces = [NSData dataWithBytes:faceBuffer
-                                   length:sizeof(int)*faceBufferSize];
-
-    SCNGeometrySource* vertexSource = [SCNGeometrySource geometrySourceWithVertices:vertices
-                                                                              count:vertexCount];
-    SCNGeometrySource* normalSource = [SCNGeometrySource geometrySourceWithNormals:normals
-                                                                             count:vertexCount];
-    SCNGeometryElement* element = [SCNGeometryElement geometryElementWithData:faces
-                                                                primitiveType:SCNGeometryPrimitiveTypeTriangles
-                                                               primitiveCount:faceCount
-                                                                bytesPerIndex:sizeof(int)];
-    SCNGeometry* geometry = [SCNGeometry geometryWithSources:@[vertexSource, normalSource]
-                                                    elements:@[element]];
-    [geometry setWantsAdaptiveSubdivision:NO];
-    [geometry setFirstMaterial:_meshMaterial];
-    [_meshNode setGeometry:geometry];
-
-    free(blockBuffer);
-    free(vertexBuffer);
-    free(faceBuffer);
-    free(vertices);
-    free(normals);
-  } else if (newVersion == 0 && _meshVersion > 0) {
-    _meshVersion = 0;
-  }
-}
-
-@end
 
 
 typedef struct
@@ -135,7 +33,7 @@ typedef struct
   int _texHeight;
   CGRect _viewport;
 
-  MeshController* _meshController;
+  RCTARSixDegreesMeshController* _meshController;
   SCNScene* _scene;
   SCNNode* _cameraNode;
   SCNRenderer* _renderer;
@@ -152,6 +50,7 @@ typedef struct
     [self setDelegate:self];
     _isInitialized = SixDegreesSDK_IsInitialized();
     [self setupARKit];
+    [self setupSceneKit];
   }
   return self;
 }
@@ -256,17 +155,21 @@ typedef struct
     
     // Create a custom ARKit configuration that enables plane detection
     ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
-    config.planeDetection = ARPlaneDetectionVertical | ARPlaneDetectionHorizontal;
-    
-    // make the ARKit configuration compliant with 6D SDK requirements
-    config.autoFocusEnabled = NO;
-    // pick the highest 16:9 resolution (e.g. 1080p, 720p)
-    NSArray<ARVideoFormat *> *supportedVideoFormats = [ARWorldTrackingConfiguration supportedVideoFormats];
-    for (ARVideoFormat* videoFormat in supportedVideoFormats) {
-      if (videoFormat.imageResolution.width * 9 == videoFormat.imageResolution.height * 16) {
-        [config setVideoFormat:videoFormat];
-        break;
+    if (@available(iOS 11.3, *)) {
+      config.planeDetection = ARPlaneDetectionVertical | ARPlaneDetectionHorizontal;
+
+      // make the ARKit configuration compliant with 6D SDK requirements
+      config.autoFocusEnabled = NO;
+      // pick the highest 16:9 resolution (e.g. 1080p, 720p)
+      NSArray<ARVideoFormat *> *supportedVideoFormats = [ARWorldTrackingConfiguration supportedVideoFormats];
+      for (ARVideoFormat* videoFormat in supportedVideoFormats) {
+        if (videoFormat.imageResolution.width * 9 == videoFormat.imageResolution.height * 16) {
+          [config setVideoFormat:videoFormat];
+          break;
+        }
       }
+    } else {
+      // Fallback on earlier versions
     }
     SixDegreesSDK_InitializeWithConfig(config);
   }
@@ -335,9 +238,13 @@ typedef struct
 
 
 - (void)setupSceneKit {
-  _meshController = [MeshController new];
+  _meshController = [RCTARSixDegreesMeshController sharedInstance];
 
   _scene = [SCNScene new];
+  [_scene setFogColor:[UIColor colorWithWhite:0.7 alpha:0.2]];
+  [_scene setFogStartDistance:2.0];
+  [_scene setFogEndDistance:20.0];
+
   _cameraNode = [SCNNode new];
   [_cameraNode setCamera:[SCNCamera new]];
   [_scene.rootNode addChildNode:_cameraNode];
@@ -347,6 +254,7 @@ typedef struct
                                       options:nil];
   [_renderer setScene:_scene];
   [_renderer setPointOfView:_cameraNode];
+  [_renderer setAutoenablesDefaultLighting:YES];
 }
 
 // debugger logger stuff

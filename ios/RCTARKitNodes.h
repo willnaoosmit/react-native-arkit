@@ -26,6 +26,7 @@ typedef NS_OPTIONS(NSUInteger, RFReferenceFrame) {
 @interface RCTARKitNodes : NSObject
 
 @property (nonatomic, strong) ARSCNView *arView;
+@property (nonatomic, strong) SCNScene *arScene;
 
 @property (nonatomic, strong) SCNNode *localOrigin;
 @property (nonatomic, strong) SCNNode *cameraOrigin;
