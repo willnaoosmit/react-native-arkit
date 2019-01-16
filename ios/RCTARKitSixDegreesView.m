@@ -35,8 +35,7 @@
     [_meshNode setRenderingOrder:-10];
     _meshMaterial = [SCNMaterial new];
     [_meshMaterial setDoubleSided:YES];
-    [_meshMaterial setTransparency:0.5f];
-    _meshMaterial.diffuse.contents = [UIColor colorWithWhite:0.6f alpha:0.2f];
+    _meshMaterial.diffuse.contents = [UIColor colorWithWhite:0.6f alpha:0.5f];
     //      _meshMaterial.writesToDepthBuffer = true;
     //      _meshMaterial.readsFromDepthBuffer = true;
     //      _meshMaterial.colorBufferWriteMask = SCNColorMaskNone;
@@ -153,7 +152,7 @@ typedef struct
   if (self = [super init]) {
     [self setDevice:MTLCreateSystemDefaultDevice()];
     [self setDelegate:self];
-    _isInitialized = false;
+    _isInitialized = SixDegreesSDK_IsInitialized();
     [self setupARKit];
   }
   return self;
@@ -251,25 +250,29 @@ typedef struct
 
 
 - (void)setupARKit {
-  char version[16];
-  SixDegreesSDK_GetVersion(version, 16);
-  NSLog(@"Initializing 6D SDK version %s", version);
+//  if( !_isInitialized ){
+    char version[16];
+    SixDegreesSDK_GetVersion(version, 16);
+    NSLog(@"Initializing 6D SDK version %s", version);
 
-  // Create a custom ARKit configuration that enables plane detection
-  ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
-  config.planeDetection = ARPlaneDetectionVertical | ARPlaneDetectionHorizontal;
+    // Create a custom ARKit configuration that enables plane detection
+    ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
+    config.planeDetection = ARPlaneDetectionVertical | ARPlaneDetectionHorizontal;
 
-  // make the ARKit configuration compliant with 6D SDK requirements
-  config.autoFocusEnabled = NO;
-  // pick the highest 16:9 resolution (e.g. 1080p, 720p)
-  NSArray<ARVideoFormat *> *supportedVideoFormats = [ARWorldTrackingConfiguration supportedVideoFormats];
-  for (ARVideoFormat* videoFormat in supportedVideoFormats) {
-    if (videoFormat.imageResolution.width * 9 == videoFormat.imageResolution.height * 16) {
-      [config setVideoFormat:videoFormat];
-      break;
+    // make the ARKit configuration compliant with 6D SDK requirements
+    config.autoFocusEnabled = NO;
+    // pick the highest 16:9 resolution (e.g. 1080p, 720p)
+    NSArray<ARVideoFormat *> *supportedVideoFormats = [ARWorldTrackingConfiguration supportedVideoFormats];
+    for (ARVideoFormat* videoFormat in supportedVideoFormats) {
+      if (videoFormat.imageResolution.width * 9 == videoFormat.imageResolution.height * 16) {
+        [config setVideoFormat:videoFormat];
+        break;
+      }
     }
-  }
-  SixDegreesSDK_InitializeWithConfig(config);
+    SixDegreesSDK_InitializeWithConfig(config);
+//  } else {
+//    NSLog(@"6D already initialized");
+//  }
 }
 
 

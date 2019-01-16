@@ -48,7 +48,7 @@ static RCTARKit *instance = nil;
     
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-            ARSCNView *arView = [[ARSCNView alloc] init];
+          ARSCNView *arView = [[ARSCNView alloc] init];
             instance = [[self alloc] initWithARView:arView];
         }
     });
@@ -64,15 +64,13 @@ static RCTARKit *instance = nil;
 - (instancetype)initWithARView:(ARSCNView *)arView {
     if ((self = [super init])) {
 
-      self.sixDegressView = [[RCTARKitSixDegreesView alloc] init];
-      [self addSubview:self.sixDegressView];
-
+      if( arView ){
         self.arView = arView;
-        
+
         // delegates
         arView.delegate = self;
         arView.session.delegate = self;
-        
+
         UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
         tapGestureRecognizer.numberOfTapsRequired = 1;
         [self.arView addGestureRecognizer:tapGestureRecognizer];
@@ -98,12 +96,15 @@ static RCTARKit *instance = nil;
         arView.defaultCameraController.inertiaEnabled = YES;
         [arView.defaultCameraController translateInCameraSpaceByX:(float) 0.0 Y:(float) 0.0 Z:(float) 3.0];
 #else
-      self.sixDegressView = [[RCTARKitSixDegreesView alloc] init];
         
         #endif
         // start ARKit
         [self addSubview:arView];
         [self resume];
+      }
+
+      self.sixDegressView = [[RCTARKitSixDegreesView alloc] init];
+      [self addSubview:self.sixDegressView];
     }
     return self;
 }
@@ -112,9 +113,10 @@ static RCTARKit *instance = nil;
 
 
 - (void)layoutSubviews {
-    [super layoutSubviews];
-    //NSLog(@"setting view bounds %@", NSStringFromCGRect(self.bounds));
-    self.arView.frame = self.bounds;
+  [super layoutSubviews];
+  NSLog(@"setting view bounds %@", NSStringFromCGRect(self.bounds));
+  self.sixDegressView.frame = self.bounds;
+  self.arView.frame = self.bounds;
 }
 
 - (void)pause {
@@ -153,14 +155,16 @@ static RCTARKit *instance = nil;
 #pragma mark - setter-getter
 
 - (ARSession*)session {
-    return self.arView.session;
+  return self.arView ? self.arView.session : nil;
 }
 
 - (BOOL)debug {
-    return self.arView.showsStatistics;
+  return self.arView ? self.arView.showsStatistics : true;
+//    return self.arView.showsStatistics;
 }
 
 - (void)setDebug:(BOOL)debug {
+  if( self.arView ){
     if (debug) {
         self.arView.showsStatistics = YES;
         self.arView.debugOptions = ARSCNDebugOptionShowWorldOrigin | ARSCNDebugOptionShowFeaturePoints;
@@ -168,6 +172,7 @@ static RCTARKit *instance = nil;
         self.arView.showsStatistics = NO;
         self.arView.debugOptions = SCNDebugOptionNone;
     }
+  }
 }
 
 - (ARPlaneDetection)planeDetection {
