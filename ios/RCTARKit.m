@@ -48,8 +48,10 @@ static RCTARKit *instance = nil;
     
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-          ARSCNView *arView = [[ARSCNView alloc] init];
-            instance = [[self alloc] initWithARView:arView];
+//          ARSCNView *arView = [[ARSCNView alloc] init];
+//          instance = [[self alloc] initWithARView:arView];
+          RCTARKitSixDegreesView *sixDegressView = [[RCTARKitSixDegreesView alloc] init];
+          instance = [[self alloc] initWithSixDegreesView:sixDegressView];
         }
     });
     
@@ -61,9 +63,35 @@ static RCTARKit *instance = nil;
     return self.superview != nil;
 }
 
+- (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesView *)sixDegreesView {
+  if ((self = [super init])) {
+    self.useSixDegreesSDK = YES;
+    self.sixDegressView = sixDegreesView;
+    [self addSubview:self.sixDegressView];
+    SCNScene* scene = [self.sixDegressView scene];
+
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
+    tapGestureRecognizer.numberOfTapsRequired = 1;
+    [self.arView addGestureRecognizer:tapGestureRecognizer];
+
+    self.touchDelegates = [NSMutableArray array];
+    self.rendererDelegates = [NSMutableArray array];
+    self.sessionDelegates = [NSMutableArray array];
+
+    // nodeManager
+    self.nodeManager = [RCTARKitNodes sharedInstance];
+    [self.sessionDelegates addObject:self.nodeManager];
+    self.nodeManager.arScene = scene;
+
+    // configuration(s)
+    scene.rootNode.name = @"root";
+
+  }
+  return self;
+}
+
 - (instancetype)initWithARView:(ARSCNView *)arView {
     if ((self = [super init])) {
-
       if( arView ){
         self.arView = arView;
 
@@ -103,8 +131,6 @@ static RCTARKit *instance = nil;
         [self resume];
       }
 
-      self.sixDegressView = [[RCTARKitSixDegreesView alloc] init];
-      [self addSubview:self.sixDegressView];
     }
     return self;
 }
@@ -116,22 +142,23 @@ static RCTARKit *instance = nil;
   [super layoutSubviews];
   NSLog(@"setting view bounds %@", NSStringFromCGRect(self.bounds));
   self.sixDegressView.frame = self.bounds;
-  self.arView.frame = self.bounds;
+//  self.arView.frame = self.bounds;
 }
 
 - (void)pause {
   if( self.useSixDegreesSDK ){
     [self.sixDegressView pause];
   } else {
-    [self.session pause];
+//    [self.session pause];
   }
 }
 
 - (void)resume {
   if( self.useSixDegreesSDK ){
+    self.nodeManager.arScene = [self.sixDegressView scene];
     [self.sixDegressView resume];
   } else {
-    [self.session runWithConfiguration:self.configuration];
+//    [self.session runWithConfiguration:self.configuration];
   }
 }
 
@@ -148,9 +175,9 @@ static RCTARKit *instance = nil;
   if( self.useSixDegreesSDK ){
     [self.sixDegressView reset];
   } else {
-    if (ARWorldTrackingConfiguration.isSupported) {
-      [self.session runWithConfiguration:self.configuration options:ARSessionRunOptionRemoveExistingAnchors | ARSessionRunOptionResetTracking];
-    }
+//    if (ARWorldTrackingConfiguration.isSupported) {
+//      [self.session runWithConfiguration:self.configuration options:ARSessionRunOptionRemoveExistingAnchors | ARSessionRunOptionResetTracking];
+//    }
   }
 }
 
@@ -166,6 +193,7 @@ static RCTARKit *instance = nil;
 
 - (SCNScene*)scene {
   if( self.sixDegressView ){
+    self.nodeManager.arScene = [self.sixDegressView scene];
     return [self.sixDegressView scene];
   }
   return self.arView.scene;
@@ -242,10 +270,11 @@ static RCTARKit *instance = nil;
     [self resume];
 }
 - (void)setAutoenablesDefaultLighting:(BOOL)autoenablesDefaultLighting {
-    self.arView.autoenablesDefaultLighting = autoenablesDefaultLighting;
+//    self.arView.autoenablesDefaultLighting = autoenablesDefaultLighting;
 }
 
 - (BOOL)autoenablesDefaultLighting {
+  return false;
     return self.arView.autoenablesDefaultLighting;
 }
 
@@ -316,6 +345,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 }
 
 - (SCNVector3)projectPoint:(SCNVector3)point {
+  return SCNVector3Zero;
     return [self.arView projectPoint:[self.nodeManager getAbsolutePositionToOrigin:point]];
     
 }
@@ -337,11 +367,15 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (bool)getNodeVisibility:(NSString *)nodeId {
+  return false;
+
   SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
   return [self.arView isNodeInsideFrustum:node withPointOfView:self.arView.pointOfView];
 }
 
 - (void)moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId {
+  return;
+
   SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
   SCNNode *target = [self.nodeManager getNodeWithId:targetNodeId];
   SCNLookAtConstraint *pointToNode = [SCNLookAtConstraint lookAtConstraintWithTarget:target];
@@ -380,6 +414,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (UIImage *)getSnapshot:(NSDictionary *)selection {
+  return nil;
     UIImage *image = [self.arView snapshot];
     
     
@@ -392,6 +427,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (UIImage *)getSnapshotCamera:(NSDictionary *)selection {
+  return nil;
     CVPixelBufferRef pixelBuffer = self.arView.session.currentFrame.capturedImage;
     CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
     
@@ -519,6 +555,7 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
 
 
 - (NSDictionary *)getPlaneHitResult:(const CGPoint)tapPoint  types:(ARHitTestResultType)types; {
+  return nil;
     NSArray<ARHitTestResult *> *results = [self.arView hitTest:tapPoint types:types];
     NSMutableArray * resultsMapped = [self.nodeManager mapHitResults:results];
     NSDictionary *planeHitResult = getPlaneHitResult(resultsMapped, tapPoint);
@@ -526,6 +563,8 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
 }
 
 - (void)handleTapFrom: (UITapGestureRecognizer *)recognizer {
+  return;
+
     // Take the screen space tap coordinates and pass them to the hitTest method on the ARSCNView instance
     CGPoint tapPoint = [recognizer locationInView:self.arView];
     //
@@ -671,7 +710,8 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
 #pragma mark - ARSessionDelegate
 
 - (ARFrame * _Nullable)currentFrame {
-    return self.arView.session.currentFrame;
+//    return self.arView.session.currentFrame;
+  return nil;
 }
 
 - (NSDictionary *)getCurrentLightEstimation {
