@@ -7,12 +7,15 @@
 //
 
 #import <MetalKit/MetalKit.h>
+#import <SceneKit/SceneKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTARKitSixDegreesView : MTKView
 
 - (instancetype)init;
+
+- (SCNScene*)scene;
 
 @end
 

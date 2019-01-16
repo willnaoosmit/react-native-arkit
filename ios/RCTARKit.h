@@ -90,6 +90,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (bool)getNodeVisibility:(NSString *)nodeId;
 - (void)addRendererDelegates:(id)delegate;
 - (void)removeRendererDelegates:(id)delegate;
+- (SCNScene*)scene;
 
 #pragma mark - Delegates
 - (void)renderer:(id <SCNSceneRenderer>)renderer didRenderScene:(SCNScene *)scene atTime:(NSTimeInterval)time;

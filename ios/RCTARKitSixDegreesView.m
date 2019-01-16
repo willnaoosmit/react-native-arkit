@@ -11,8 +11,6 @@
 #import <SixDegreesSDK/SixDegreesSDK.h>
 #import <SixDegreesSDK/SixDegreesSDK_advanced.h>
 
-#import <SceneKit/SceneKit.h>
-
 @interface MeshController : NSObject
   - (void)update;
 
@@ -247,7 +245,9 @@ typedef struct
   //    }
 }
 
-
+- (SCNScene*)scene {
+  return _scene;
+}
 
 - (void)setupARKit {
 //  if( !_isInitialized ){
@@ -381,7 +381,4 @@ typedef struct
  }
  */
 
--(SCNScene *)scene{
-  return _scene;
-}
 @end

@@ -152,6 +152,14 @@ static RCTARKit *instance = nil;
 }
 
 
+- (SCNScene*)scene {
+  if( self.sixDegressView ){
+    return [self.sixDegressView scene];
+  }
+  return self.arView.scene;
+}
+
+
 #pragma mark - setter-getter
 
 - (ARSession*)session {
