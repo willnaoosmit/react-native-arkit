@@ -30,6 +30,7 @@
   self = [super init];
   if (self) {
     _meshNode = [SCNNode new];
+    [_meshNode setName:@"SixDegreesMesh"];
     [_meshNode setRenderingOrder:-10];
     _meshMaterial = [SCNMaterial new];
     [_meshMaterial setDoubleSided:YES];
@@ -135,7 +136,6 @@ typedef struct
   CGRect _viewport;
 
   MeshController* _meshController;
-//  PlaneController* _planeController;
   SCNScene* _scene;
   SCNNode* _cameraNode;
   SCNRenderer* _renderer;
@@ -199,7 +199,6 @@ typedef struct
 
   { // scene
      [_meshController update];
-    // [_planeController update];
 
     GLKMatrix4 pose;
     int trackingQuality = SixDegreesSDK_GetPose(pose.m, 16);
@@ -250,15 +249,15 @@ typedef struct
 }
 
 - (void)setupARKit {
-//  if( !_isInitialized ){
+  if( !_isInitialized ){
     char version[16];
     SixDegreesSDK_GetVersion(version, 16);
     NSLog(@"Initializing 6D SDK version %s", version);
-
+    
     // Create a custom ARKit configuration that enables plane detection
     ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
     config.planeDetection = ARPlaneDetectionVertical | ARPlaneDetectionHorizontal;
-
+    
     // make the ARKit configuration compliant with 6D SDK requirements
     config.autoFocusEnabled = NO;
     // pick the highest 16:9 resolution (e.g. 1080p, 720p)
@@ -270,9 +269,7 @@ typedef struct
       }
     }
     SixDegreesSDK_InitializeWithConfig(config);
-//  } else {
-//    NSLog(@"6D already initialized");
-//  }
+  }
 }
 
 
@@ -339,14 +336,12 @@ typedef struct
 
 - (void)setupSceneKit {
   _meshController = [MeshController new];
-//  _planeController = [PlaneController new];
 
   _scene = [SCNScene new];
   _cameraNode = [SCNNode new];
   [_cameraNode setCamera:[SCNCamera new]];
   [_scene.rootNode addChildNode:_cameraNode];
   [_scene.rootNode addChildNode:_meshController.meshNode];
-//  [_scene.rootNode addChildNode:_planeController.planesNode];
 
   _renderer = [SCNRenderer rendererWithDevice:self.device
                                       options:nil];
@@ -362,23 +357,16 @@ typedef struct
 }
 
 
-- (void)removeFromSuperview
-{
-  [self shutdown];
-
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [super removeFromSuperview];
+- (void) pause {
+  // 6D does not support the notion of pausing as of 0.19.2
 }
 
-- (void)shutdown {
+- (void) resume {
+  // 6D does not support the notion of resuming as of 0.19.2
 }
 
-/*
- // Only override drawRect: if you perform custom drawing.
- // An empty implementation adversely affects performance during animation.
- - (void)drawRect:(CGRect)rect {
- // Drawing code
- }
- */
+- (void) reset {
+  // 6D does not support the notion of resuming as of 0.19.2
+}
 
 @end

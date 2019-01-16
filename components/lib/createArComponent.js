@@ -25,7 +25,7 @@ import addAnimatedSupport from './addAnimatedSupport';
 import generateId from './generateId';
 import processMaterial from './processMaterial';
 
-const DEBUG = false;
+const DEBUG = true;
 
 const { ARGeosManager } = NativeModules;
 
