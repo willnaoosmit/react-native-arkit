@@ -9,6 +9,8 @@
 #import "RCTARKit.h"
 #import "RCTConvert+ARKit.h"
 
+#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
+
 @import CoreLocation;
 
 @interface RCTARKit () <ARSCNViewDelegate, ARSessionDelegate, UIGestureRecognizerDelegate> {
@@ -65,14 +67,11 @@ static RCTARKit *instance = nil;
 
 - (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesView *)sixDegreesView {
   if ((self = [super init])) {
+
     self.useSixDegreesSDK = YES;
     self.sixDegressView = sixDegreesView;
     [self addSubview:self.sixDegressView];
     SCNScene* scene = [self.sixDegressView scene];
-
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
-    tapGestureRecognizer.numberOfTapsRequired = 1;
-    [self.arView addGestureRecognizer:tapGestureRecognizer];
 
     self.touchDelegates = [NSMutableArray array];
     self.rendererDelegates = [NSMutableArray array];
@@ -85,6 +84,18 @@ static RCTARKit *instance = nil;
 
     // configuration(s)
     scene.rootNode.name = @"root";
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+      self.arView = [ARSCNView new];
+      ARSession* session = SixDegreesSDK_GetARKitSession();
+      [self.arView setSession:session];
+      [self.arView setScene:scene];
+
+      UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
+      tapGestureRecognizer.numberOfTapsRequired = 1;
+      [self.arView addGestureRecognizer:tapGestureRecognizer];
+//      [self addSubview:self.arView];
+    });
 
   }
   return self;
@@ -142,7 +153,7 @@ static RCTARKit *instance = nil;
   [super layoutSubviews];
   NSLog(@"setting view bounds %@", NSStringFromCGRect(self.bounds));
   self.sixDegressView.frame = self.bounds;
-//  self.arView.frame = self.bounds;
+  self.arView.frame = self.bounds;
 }
 
 - (void)pause {
@@ -270,11 +281,10 @@ static RCTARKit *instance = nil;
     [self resume];
 }
 - (void)setAutoenablesDefaultLighting:(BOOL)autoenablesDefaultLighting {
-//    self.arView.autoenablesDefaultLighting = autoenablesDefaultLighting;
+    self.arView.autoenablesDefaultLighting = autoenablesDefaultLighting;
 }
 
 - (BOOL)autoenablesDefaultLighting {
-  return false;
     return self.arView.autoenablesDefaultLighting;
 }
 
@@ -367,15 +377,11 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (bool)getNodeVisibility:(NSString *)nodeId {
-  return false;
-
   SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
   return [self.arView isNodeInsideFrustum:node withPointOfView:self.arView.pointOfView];
 }
 
 - (void)moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId {
-  return;
-
   SCNNode *node = [self.nodeManager getNodeWithId:nodeId];
   SCNNode *target = [self.nodeManager getNodeWithId:targetNodeId];
   SCNLookAtConstraint *pointToNode = [SCNLookAtConstraint lookAtConstraintWithTarget:target];
@@ -414,7 +420,6 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (UIImage *)getSnapshot:(NSDictionary *)selection {
-  return nil;
     UIImage *image = [self.arView snapshot];
     
     
@@ -427,7 +432,6 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (UIImage *)getSnapshotCamera:(NSDictionary *)selection {
-  return nil;
     CVPixelBufferRef pixelBuffer = self.arView.session.currentFrame.capturedImage;
     CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
     
@@ -555,7 +559,21 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
 
 
 - (NSDictionary *)getPlaneHitResult:(const CGPoint)tapPoint  types:(ARHitTestResultType)types; {
-  return nil;
+  ARSession* _arSession;
+  if (!_arSession) {
+    _arSession = SixDegreesSDK_GetARKitSession();
+    if (!_arSession) return nil;
+  }
+
+  [self.arView setSession:_arSession];
+  [self.arView setScene:self.sixDegressView.scene];
+
+  ARFrame* frame = [_arSession currentFrame];
+  if (!frame) return nil;
+
+//  simd_float4x4 transform = frame.camera.transform;
+
+//    NSArray<ARHitTestResult *> *results = [frame hitTest:tapPoint types:types];
     NSArray<ARHitTestResult *> *results = [self.arView hitTest:tapPoint types:types];
     NSMutableArray * resultsMapped = [self.nodeManager mapHitResults:results];
     NSDictionary *planeHitResult = getPlaneHitResult(resultsMapped, tapPoint);
@@ -563,8 +581,6 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
 }
 
 - (void)handleTapFrom: (UITapGestureRecognizer *)recognizer {
-  return;
-
     // Take the screen space tap coordinates and pass them to the hitTest method on the ARSCNView instance
     CGPoint tapPoint = [recognizer locationInView:self.arView];
     //
