@@ -10,7 +10,7 @@
 #import <SceneKit/SceneKit.h>
 #import <ARKit/ARKit.h>
 
-#import "RCTARKitSixDegreesView.h"
+#import "RCTARKitSixDegreesManager.h"
 #import "RCTARKitDelegate.h"
 #import "RCTARKitNodes.h"
 
@@ -33,7 +33,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 
 #pragma mark - Properties
 @property (nonatomic, strong) ARSCNView *arView;
-@property (nonatomic, strong) RCTARKitSixDegreesView *sixDegressView;
+@property (nonatomic, strong) RCTARKitSixDegreesManager *sixDegressManager;
 @property (nonatomic, strong) RCTARKitNodes *nodeManager;
 
 @property (nonatomic, assign) BOOL debug;

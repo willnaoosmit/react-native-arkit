@@ -11,13 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RCTARKitSixDegreesView : MTKView
+@interface RCTARKitSixDegreesManager : MTKView<MTKViewDelegate>
 
 - (instancetype)init;
-
-- (void)pause;
-- (void)resume;
-- (void)reset;
 
 @end
 

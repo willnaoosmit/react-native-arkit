@@ -50,9 +50,9 @@ static RCTARKit *instance = nil;
     
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-          RCTARKitSixDegreesView *sixDegressView = [[RCTARKitSixDegreesView alloc] init];
+          RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
           ARSCNView *arView = [[ARSCNView alloc] init];
-          instance = [[self alloc] initWithSixDegreesView:sixDegressView arView:arView];
+          instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
         }
     });
     
@@ -64,13 +64,31 @@ static RCTARKit *instance = nil;
     return self.superview != nil;
 }
 
-- (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesView *)sixDegreesView arView:(ARSCNView *)arView {
+- (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView {
   if ((self = [super init])) {
-
+    
     self.useSixDegreesSDK = YES;
-    self.sixDegressView = sixDegreesView;
-    [self addSubview:self.sixDegressView];
-    SCNScene* scene = [SCNScene new];
+    self.sixDegressManager = sixDegreesView;
+    [self addSubview:self.sixDegressManager];
+
+    // Wait for 6d to get the ARSession
+    ARSession* sixSession = SixDegreesSDK_GetARKitSession();
+    int watchdog = 0;
+    while( sixSession == nil && watchdog++ < 3000 ) {
+      // Let 6D get the ARKit session going
+      [NSThread sleepForTimeInterval:0.1];
+      sixSession = SixDegreesSDK_GetARKitSession();
+    }
+    // Now that 6D is up and running, get the ARSession and configure our ARSCNView
+    [self setSession:sixSession];
+    self.arView = arView;
+    [self.arView setSession:sixSession];
+
+    // configuration(s)
+    self.arView.scene.rootNode.name = @"root";
+    self.arView.autoenablesDefaultLighting = YES;
+
+    [self.arView setBackgroundColor:[UIColor clearColor]];
 
     self.touchDelegates = [NSMutableArray array];
     self.rendererDelegates = [NSMutableArray array];
@@ -79,33 +97,15 @@ static RCTARKit *instance = nil;
     // nodeManager
     self.nodeManager = [RCTARKitNodes sharedInstance];
     [self.sessionDelegates addObject:self.nodeManager];
-
-    // configuration(s)
-    scene.rootNode.name = @"root";
-
-      ARSession* session = SixDegreesSDK_GetARKitSession();
-    int watchdog = 0;
-    while( !session && watchdog++ < 3000 ) {
-      // Let 6D get the ARKit session going
-      [NSThread sleepForTimeInterval:0.1];
-      session = SixDegreesSDK_GetARKitSession();
-    }
-    self.arView = arView;
-    [self.arView setSession:session];
-    [self.arView setScene:scene];
-
-    // configuration(s)
-    self.arView.autoenablesDefaultLighting = YES;
-    self.arView.scene.rootNode.name = @"root";
-
-    [self.arView setBackgroundColor:[UIColor clearColor]];
-
     self.nodeManager.arView = self.arView;
 
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
     tapGestureRecognizer.numberOfTapsRequired = 1;
     [self.arView addGestureRecognizer:tapGestureRecognizer];
+
+
     [self addSubview:self.arView];
+    [self resume];
   }
   return self;
 }
@@ -166,19 +166,11 @@ static RCTARKit *instance = nil;
 }
 
 - (void)pause {
-  if( self.useSixDegreesSDK ){
-    [self.sixDegressView pause];
-  } else {
-//    [self.session pause];
-  }
+  [self.session pause];
 }
 
 - (void)resume {
-  if( self.useSixDegreesSDK ){
-    [self.sixDegressView resume];
-  } else {
-//    [self.session runWithConfiguration:self.configuration];
-  }
+  [self.session runWithConfiguration:self.configuration];
 }
 
 - (void)session:(ARSession *)session didFailWithError:(NSError *)error {
@@ -191,12 +183,8 @@ static RCTARKit *instance = nil;
     
 }
 - (void)reset {
-  if( self.useSixDegreesSDK ){
-    [self.sixDegressView reset];
-  } else {
-//    if (ARWorldTrackingConfiguration.isSupported) {
-//      [self.session runWithConfiguration:self.configuration options:ARSessionRunOptionRemoveExistingAnchors | ARSessionRunOptionResetTracking];
-//    }
+  if (ARWorldTrackingConfiguration.isSupported) {
+    [self.session runWithConfiguration:self.configuration options:ARSessionRunOptionRemoveExistingAnchors | ARSessionRunOptionResetTracking];
   }
 }
 
@@ -562,9 +550,6 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
 
 
 - (NSDictionary *)getPlaneHitResult:(const CGPoint)tapPoint  types:(ARHitTestResultType)types; {
-
-
-//    NSArray<SCNHitTestResult *> *results = [self.sixDegressView.renderer hitTest:tapPoint options:nil];
     NSArray<ARHitTestResult *> *results = [self.arView hitTest:tapPoint types:types];
     NSMutableArray * resultsMapped = [self.nodeManager mapHitResults:results];
     NSDictionary *planeHitResult = getPlaneHitResult(resultsMapped, tapPoint);
