@@ -7,10 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <SceneKit/SceneKit.h>
+#import <React/RCTBridgeModule.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RCTARKitSixDegreesPlaneController : NSObject
+@interface RCTARKitSixDegreesPlaneController : NSObject<RCTBridgeModule>
+
++ (instancetype)sharedInstance;
+
+- (void)update;
+
+@property (readonly) SCNNode* planesNode;
+@property (readonly) SCNMaterial* planeMaterial;
+
 
 @end
 

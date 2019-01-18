@@ -15,7 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 
-- (SCNScene*)scene;
 - (void)pause;
 - (void)resume;
 - (void)reset;
