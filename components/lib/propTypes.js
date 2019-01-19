@@ -132,6 +132,7 @@ export const material = PropTypes.shape({
   specular: materialProperty,
   displacement: materialProperty,
   diffuse: PropTypes.oneOfType([PropTypes.string, materialProperty]),
+  ambient: PropTypes.oneOfType([PropTypes.string, materialProperty]),
   metalness: PropTypes.number,
   roughness: PropTypes.number,
   blendMode,

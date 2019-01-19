@@ -417,6 +417,7 @@ Most objects take a material property with these sub-props:
 | Prop | Type | Description |
 |---|---|---|
 | `diffuse` | `{ ...mapProperties }` (see below) | [diffuse](https://developer.apple.com/documentation/scenekit/scnmaterial/1462589-diffuse?language=objc)
+| `ambient` | `{ ...mapProperties }` (see below) | [ambient](https://developer.apple.com/documentation/scenekit/scnmaterial/1462558-ambient?language=objc)
 | `specular` | `{ ...mapProperties }` (see below) | [specular](https://developer.apple.com/documentation/scenekit/scnmaterial/1462516-specular?language=objc)
 | `displacement` | `{ ...mapProperties }` (see below) | [displacement](https://developer.apple.com/documentation/scenekit/scnmaterial/2867516-displacement?language=objc)
 | `normal` | `{ ...mapProperties }` (see below) |  [normal](https://developer.apple.com/documentation/scenekit/scnmaterial/1462542-normal)
