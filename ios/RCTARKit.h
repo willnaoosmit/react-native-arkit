@@ -81,7 +81,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (UIImage *)getSnapshotCamera:(NSDictionary*)selection;
 - (void)focusScene;
 - (void)clearScene;
-- (void)moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId;
+- (void)moveNodeToCamera:(NSString *)nodeId;
 - (NSDictionary *)readCameraPosition;
 - (NSDictionary *)readCamera;
 - (NSDictionary* )getCurrentLightEstimation;

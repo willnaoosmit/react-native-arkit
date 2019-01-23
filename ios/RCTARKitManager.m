@@ -408,8 +408,8 @@ RCT_EXPORT_METHOD(checkNodeVisible:(NSString *)nodeId resolve:(RCTPromiseResolve
   resolve(@(nodeIsVisible));
 }
 
-RCT_EXPORT_METHOD(moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-  [[ARKit sharedInstance] moveNodeToCamera:nodeId targetNodeId:targetNodeId];
+RCT_EXPORT_METHOD(moveNodeToCamera:(NSString *)nodeId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  [[ARKit sharedInstance] moveNodeToCamera:nodeId];
   resolve(@{});
 }
 
