@@ -83,6 +83,9 @@ static RCTARKit *instance = nil;
     [self setSession:sixSession];
     self.arView = arView;
     [self.arView setSession:sixSession];
+    
+//    self.arView.delegate = self;
+//    self.arView.session.delegate = self;
 
     // configuration(s)
     self.arView.scene.rootNode.name = @"root";
@@ -331,17 +334,18 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (NSDictionary *)readCamera {
-    SCNVector3 position = self.nodeManager.cameraOrigin.position;
-    SCNVector4 rotation = self.nodeManager.cameraOrigin.rotation;
-    SCNVector4 orientation = self.nodeManager.cameraOrigin.orientation;
-    SCNVector3 eulerAngles = self.nodeManager.cameraOrigin.eulerAngles;
-    SCNVector3 direction = self.nodeManager.cameraDirection;
+  
+    SCNVector3 position = self.arView.pointOfView.position;
+    SCNVector4 rotation = self.arView.pointOfView.rotation;
+    SCNVector4 orientation = self.arView.pointOfView.orientation;
+    SCNVector3 eulerAngles = self.arView.pointOfView.eulerAngles;
+//    SCNVector3 direction = self.nodeManager.cameraDirection;
     return @{
              @"position":vectorToJson(position),
              @"rotation":vector4ToJson(rotation),
              @"orientation":vector4ToJson(orientation),
              @"eulerAngles":vectorToJson(eulerAngles),
-             @"direction":vectorToJson(direction),
+//             @"direction":vectorToJson(direction),
              };
 }
 
