@@ -7,7 +7,7 @@ export default ARComponent => {
   // there is a strange issue: animatedvalues can't be child objects,
   // so we have to flatten them
   // we would need to have an Animated.ValueXYZ
-  const ANIMATEABLE3D = ['position', 'eulerAngles'];
+  const ANIMATEABLE3D = ['position', 'eulerAngles', 'rotation'];
 
   const ARComponentAnimatedInner = Animated.createAnimatedComponent(
     class extends React.PureComponent {
@@ -20,10 +20,12 @@ export default ARComponent => {
             x: get(props, `_flattened_${key}_x`),
             y: get(props, `_flattened_${key}_y`),
             z: get(props, `_flattened_${key}_z`),
+            w: get(props, `_flattened_${key}_w`),
           };
           unset(props, `_flattened_${key}_x`);
           unset(props, `_flattened_${key}_y`);
           unset(props, `_flattened_${key}_z`);
+          unset(props, `_flattened_${key}_w`);
         });
         return <ARComponent {...props} {...unflattened} />;
       }
@@ -37,6 +39,7 @@ export default ARComponent => {
       flattenedProps[`_flattened_${key}_x`] = get(props, [key, 'x']);
       flattenedProps[`_flattened_${key}_y`] = get(props, [key, 'y']);
       flattenedProps[`_flattened_${key}_z`] = get(props, [key, 'z']);
+      flattenedProps[`_flattened_${key}_w`] = get(props, [key, 'w']);
     });
 
     return <ARComponentAnimatedInner {...props} {...flattenedProps} />;
