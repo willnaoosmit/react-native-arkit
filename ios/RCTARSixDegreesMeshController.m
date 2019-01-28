@@ -103,6 +103,10 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
   return self;
 }
 
+- (SCNNode*) node {
+  return _meshNode;
+}
+
 - (void)update {
   if( SixDegreesSDK_IsInitialized() ){
     int blockBufferSize = 0;
@@ -163,6 +167,16 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
         [geometry setFirstMaterial:_meshMaterial];
       }
       [_meshNode setGeometry:geometry];
+      _meshNode.physicsBody = [SCNPhysicsBody
+                               bodyWithType:SCNPhysicsBodyTypeStatic
+                               shape:[SCNPhysicsShape
+                                      shapeWithGeometry:geometry
+                                      options:@{
+                                                SCNPhysicsShapeKeepAsCompoundKey: @TRUE,
+                                                SCNPhysicsShapeTypeKey: SCNPhysicsShapeTypeConcavePolyhedron,
+                                                }
+                                      ]
+                               ];
 
       free(blockBuffer);
       free(vertexBuffer);

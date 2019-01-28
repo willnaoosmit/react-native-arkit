@@ -14,14 +14,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTARSixDegreesMeshController : NSObject<RCTBridgeModule>
 
-+ (instancetype)sharedInstance;
-
-- (void)update;
-
 @property (readonly) SCNNode* meshNode;
 @property (readonly) SCNNode* matNode;
 @property (readonly) SCNMaterial* meshMaterial;
 @property (readonly) int meshVersion;
+
++ (instancetype)sharedInstance;
+
+- (void)update;
+- (SCNNode*) node;
+
 @end
 
 NS_ASSUME_NONNULL_END
