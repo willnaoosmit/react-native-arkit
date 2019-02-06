@@ -35,7 +35,7 @@ CGFloat focDistance = 0.2f;
 + (instancetype)sharedInstance {
     static RCTARKitNodes *instance = nil;
     static dispatch_once_t onceToken;
-    
+
     dispatch_once(&onceToken, ^{
         if (instance == nil) {
             instance = [[self alloc] init];
@@ -49,15 +49,15 @@ CGFloat focDistance = 0.2f;
         // local reference frame origin
         self.localOrigin = [[SCNNode alloc] init];
         self.localOrigin.name = @"localOrigin";
-        
+
         // camera reference frame origin
         self.cameraOrigin = [[SCNNode alloc] init];
         self.cameraOrigin.name = @"cameraOrigin";
-        
+
         // front-of-camera frame origin
         self.frontOfCamera = [[SCNNode alloc] init];
         self.frontOfCamera.name = @"frontOfCamera";
-        
+
         // init caches
         self.nodes = [NSMutableDictionary new];
         self.orphans = [NSMutableDictionary new];
@@ -66,19 +66,19 @@ CGFloat focDistance = 0.2f;
 }
 
 - (void)setArView:(ARSCNView *)arView {
-    NSLog(@"setArView");
+    // NSLog(@"setArView");
     _arView = arView;
     self.rootNode = arView.scene.rootNode;
-    
+
     self.rootNode.name = @"root";
-    
+
     [self.rootNode addChildNode:self.localOrigin];
     [self.rootNode addChildNode:self.cameraOrigin];
     [self.rootNode addChildNode:self.frontOfCamera];
 }
 
 - (void)setArScene:(SCNScene *)arScene {
-  NSLog(@"setArView");
+//   NSLog(@"setArScene");
   _arScene = arScene;
   self.rootNode = _arScene.rootNode;
 
@@ -98,13 +98,13 @@ CGFloat focDistance = 0.2f;
  add a node to scene on a frame (defaults to Local) or to a parentNode (if parentId is given)
  */
 - (void)addNodeToScene:(SCNNode *)node inReferenceFrame:(NSString *)referenceFrame withParentId:(NSString *)parentId  {
-    NSLog(@"addNodeToScene node: %@ ", node.name);
+    // NSLog(@"addNodeToScene node: %@ ", node.name);
     if(parentId) {
         [self addNodeToParent:node parentId:parentId];
     } else {
         [self addNodeToFrame:node referenceFrame:referenceFrame];
     }
-    
+
 }
 /**
  add a node to scene in a reference frame
@@ -127,7 +127,7 @@ CGFloat focDistance = 0.2f;
 
 - (void)addNodeToParent:(SCNNode *)node parentId:(NSString *)parentId  {
     SCNNode * parentNode = [self getNodeWithId:parentId];
-   
+
     if(!parentNode) {
         NSMutableSet * orphansLookingForParent = [self.orphans objectForKey:parentId];
         if(!orphansLookingForParent) {
@@ -136,51 +136,51 @@ CGFloat focDistance = 0.2f;
             [orphansLookingForParent addObject:node];
         }
         [self.orphans setObject:orphansLookingForParent forKey:parentId];
-       
+
     } else {
         [parentNode addChildNode:node];
-        
+
     }
      [self registerNode:node withId:node.name];
-    
-   
-   
+
+
+
 }
 
 - (void)clear {
     // clear scene
     NSArray *keys = [self.nodes allKeys];
-    
+
     for (id key in keys) {
         id node = [self.nodes objectForKey:key];
         if (node) {
             [node removeFromParentNode];
         }
-        
+
     }
     [self.nodes removeAllObjects];
 }
 
 - (void)addNodeToLocalFrame:(SCNNode *)node {
     node.referenceFrame = RFReferenceFrameLocal;
-    
+
     [self.localOrigin addChildNode:node];
     //NSLog(@"[RCTARKitNodes] Add node %@ to Local frame at (%.2f, %.2f, %.2f)", node.name, node.position.x, node.position.y, node.position.z);
-    
+
 }
 
 - (void)addNodeToCameraFrame:(SCNNode *)node {
     node.referenceFrame = RFReferenceFrameCamera;
     //NSLog(@"[RCTARKitNodes] Add node %@ to Camera frame at (%.2f, %.2f, %.2f)", node.name, node.position.x, node.position.y, node.position.z);
-    
+
     [self.cameraOrigin addChildNode:node];
 }
 
 - (void)addNodeToFrontOfCameraFrame:(SCNNode *)node {
     node.referenceFrame = RFReferenceFrameFrontOfCamera;
-    
+
     //NSLog(@"[RCTARKitNodes] Add node %@ to FrontOfCamera frame at (%.2f, %.2f, %.2f)", node.name, node.position.x, node.position.y, node.position.z);
-    
+
     [self.frontOfCamera addChildNode:node];
 }
 
@@ -244,16 +244,16 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
 
 
 - (NSMutableArray *) mapHitResultsWithSceneResults: (NSArray<SCNHitTestResult *> *)results {
-    
+
     NSMutableArray *resultsMapped = [NSMutableArray arrayWithCapacity:[results count]];
-    
+
     [results enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop) {
         SCNHitTestResult *result = (SCNHitTestResult *) obj;
         SCNNode * node = result.node;
-        
+
         NSString * nodeId = [self findNodeId:node];
         if(nodeId) {
-            
+
             SCNVector3 positionAbsolute = result.worldCoordinates;
             SCNVector3 position = [self getRelativePositionToOrigin:positionAbsolute];
             // TODO: allow passing in of relative group name
@@ -286,11 +286,11 @@ static SCNVector3 toSCNVector3(simd_float4 float4) {
                                      };
             [resultsMapped addObject:(resultDict )];
         }
-        
+
     }];
-    
+
     return resultsMapped;
-    
+
 }
 
 
@@ -302,10 +302,10 @@ static id ObjectOrNull(id object)
 
 - (NSMutableArray *) mapHitResults:(NSArray<ARHitTestResult *> *)results {
     NSMutableArray *resultsMapped = [NSMutableArray arrayWithCapacity:[results count]];
-    
+
     [results enumerateObjectsUsingBlock:^(id obj, NSUInteger index, BOOL *stop) {
         ARHitTestResult *result = (ARHitTestResult *) obj;
-        
+
         SCNVector3 positionAbsolute = toSCNVector3(result.worldTransform.columns[3]);
         SCNVector3 position = [self getRelativePositionToOrigin:positionAbsolute];
         [resultsMapped addObject:(@{
@@ -332,7 +332,7 @@ static id ObjectOrNull(id object)
     if (node) {
         //NSLog(@"registering node %@", nodeId);
         [self.nodes setObject:node forKey:nodeId];
-        
+
         // are there any orphans? (3d objects that have a parent, but parent has not yet been mounted
         // this seems to be the default case as react mounts first the children
         NSSet * orphans = [self.orphans objectForKey:nodeId];
@@ -347,7 +347,7 @@ static id ObjectOrNull(id object)
 
 
 - (NSString *) findNodeId:(SCNNode *)nodeWithParents {
-    
+
     SCNNode* _node = nodeWithParents;
     while(_node) {
         if(_node.name && [self.nodes objectForKey:_node.name]) {
@@ -356,7 +356,7 @@ static id ObjectOrNull(id object)
         _node = _node.parentNode;
     }
     return nil;
-    
+
 }
 
 
@@ -365,10 +365,10 @@ static id ObjectOrNull(id object)
 }
 
 - (void)removeNode:(NSString *)nodeId {
-    
+
     SCNNode *node = [self getNodeWithId:nodeId];
     if (node) {
-        NSLog(@"removing node: %@ ", nodeId);
+//        NSLog(@"removing node: %@ ", nodeId);
 
         if(node.parentNode) {
             if(node.light) {
@@ -391,7 +391,7 @@ static id ObjectOrNull(id object)
   }
   for (SCNNode* child in node.childNodes) {
     for (SCNMaterial* material in child.geometry.materials) {
-      NSLog(@"setting material: %@", [material name]);
+//      NSLog(@"setting material: %@", [material name]);
       [RCTConvert setMaterialProperties:material properties:properties[@"material"]];
       setMaterial = true;
     }
@@ -403,9 +403,9 @@ static id ObjectOrNull(id object)
 
 - (bool)updateNode:(NSString *)nodeId
         properties:(NSDictionary *) properties {
-    
+
     SCNNode *node = [self getNodeWithId:nodeId];
-     NSLog(@"updating node %@ :%@", nodeId, properties);
+//     NSLog(@"updating node %@ :%@", nodeId, properties);
     if(node) {
         [RCTConvert setNodeProperties:node properties:properties];
         if(node.geometry && properties[@"shape"]) {
@@ -421,10 +421,10 @@ static id ObjectOrNull(id object)
         return true;
     } else {
         NSLog(@"WARNING: node does not exists: %@. This means that the node has not been mounted yet, so native calls got out of order", nodeId);
-        
+
         return false;
     }
-    
+
 }
 
 
@@ -439,7 +439,7 @@ static id ObjectOrNull(id object)
     self.cameraOrigin.eulerAngles = SCNVector3Make(0, atan2f(z.x, z.z), 0);
     self.frontOfCamera.position = SCNVector3Make(pos.x - focDistance * z.x, pos.y  - focDistance * z.y, pos.z - focDistance * z.z);
     self.frontOfCamera.eulerAngles = self.cameraOrigin.eulerAngles;
-    
+
 }
 
 - (float)getCameraDistanceToPoint:(SCNVector3)point {
@@ -451,7 +451,7 @@ static float getDistance(const SCNVector3 pointA, const SCNVector3 pointB) {
     float yd = pointB.y - pointA.y;
     float zd = pointB.z - pointA.z;
     float distance = sqrt(xd * xd + yd * yd + zd * zd);
-    
+
     if (distance < 0){
         return (distance * -1);
     } else {

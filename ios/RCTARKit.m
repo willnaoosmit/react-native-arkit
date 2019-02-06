@@ -45,9 +45,9 @@ static RCTARKit *instance = nil;
 }
 
 + (instancetype)sharedInstance {
-    
+
     static dispatch_once_t onceToken;
-    
+
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
           ARSCNView *arView = [[ARSCNView alloc] init];
@@ -61,12 +61,12 @@ static RCTARKit *instance = nil;
           }
         }
     });
-    
+
     return instance;
 }
 
 - (bool)isMounted {
-    
+
     return self.superview != nil;
 }
 
@@ -88,7 +88,7 @@ static RCTARKit *instance = nil;
     [self setSession:sixSession];
     self.arView = arView;
     [self.arView setSession:sixSession];
-    
+
 //    self.arView.delegate = self;
 //    self.arView.session.delegate = self;
 
@@ -131,20 +131,20 @@ static RCTARKit *instance = nil;
         UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
         tapGestureRecognizer.numberOfTapsRequired = 1;
         [self.arView addGestureRecognizer:tapGestureRecognizer];
-        
+
         self.touchDelegates = [NSMutableArray array];
         self.rendererDelegates = [NSMutableArray array];
         self.sessionDelegates = [NSMutableArray array];
-        
+
         // nodeManager
         self.nodeManager = [RCTARKitNodes sharedInstance];
         self.nodeManager.arView = arView;
         [self.sessionDelegates addObject:self.nodeManager];
-        
+
         // configuration(s)
         arView.autoenablesDefaultLighting = YES;
         arView.scene.rootNode.name = @"root";
-        
+
         #if TARGET_IPHONE_SIMULATOR
         // allow for basic orbit gestures if we're running in the simulator
         arView.allowsCameraControl = YES;
@@ -152,7 +152,7 @@ static RCTARKit *instance = nil;
         arView.defaultCameraController.maximumVerticalAngle = 45;
         arView.defaultCameraController.inertiaEnabled = YES;
         [arView.defaultCameraController translateInCameraSpaceByX:(float) 0.0 Y:(float) 0.0 Z:(float) 3.0];
-        
+
         #endif
 
         // start ARKit
@@ -186,9 +186,9 @@ static RCTARKit *instance = nil;
         self.onARKitError(RCTJSErrorFromNSError(error));
     } else {
         NSLog(@"Initializing ARKIT failed with Error: %@ %@", error, [error userInfo]);
-        
+
     }
-    
+
 }
 - (void)reset {
   if (ARWorldTrackingConfiguration.isSupported) {
@@ -241,7 +241,7 @@ static RCTARKit *instance = nil;
 
 - (void)setPlaneDetection:(ARPlaneDetection)planeDetection {
     ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *) self.configuration;
-   
+
     configuration.planeDetection = planeDetection;
     [self resume];
 }
@@ -253,7 +253,7 @@ static RCTARKit *instance = nil;
 }
 
 -(void)setOrigin:(NSDictionary*)json {
-    
+
     if(json[@"transition"]) {
         NSDictionary * transition =json[@"transition"];
         if(transition[@"duration"]) {
@@ -261,7 +261,7 @@ static RCTARKit *instance = nil;
         } else {
             [SCNTransaction setAnimationDuration:0.0];
         }
-        
+
     } else {
         [SCNTransaction setAnimationDuration:0.0];
     }
@@ -307,7 +307,7 @@ static RCTARKit *instance = nil;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110300
 - (void)setDetectionImages:(NSArray*) detectionImages {
-    
+
     if (@available(iOS 11.3, *)) {
         ARWorldTrackingConfiguration *configuration = self.configuration;
         NSSet *detectionImagesSet = [[NSSet alloc] init];
@@ -340,7 +340,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (NSDictionary *)readCamera {
-  
+
     SCNVector3 position = self.arView.pointOfView.position;
     SCNVector4 rotation = self.arView.pointOfView.rotation;
     SCNVector4 orientation = self.arView.pointOfView.orientation;
@@ -358,7 +358,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 - (SCNVector3)projectPoint:(SCNVector3)point {
   return SCNVector3Zero;
     return [self.arView projectPoint:[self.nodeManager getAbsolutePositionToOrigin:point]];
-    
+
 }
 
 
@@ -395,9 +395,9 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
     if (_configuration) {
         return _configuration;
     }
-    
+
     if (!ARWorldTrackingConfiguration.isSupported) {}
-    
+
     _configuration = [ARWorldTrackingConfiguration new];
     _configuration.planeDetection = ARPlaneDetectionHorizontal;
     return _configuration;
@@ -408,17 +408,17 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 #pragma mark - snapshot methods
 
 - (void)hitTestSceneObjects:(const CGPoint)tapPoint resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject {
-    
+
     resolve([self.nodeManager getSceneObjectsHitResult:tapPoint]);
 }
 
 
 - (UIImage *)getSnapshot:(NSDictionary *)selection {
     UIImage *image = [self.arView snapshot];
-    
-    
+
+
     return [self cropImage:image toSelection:selection];
-    
+
 }
 
 
@@ -428,20 +428,20 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 - (UIImage *)getSnapshotCamera:(NSDictionary *)selection {
     CVPixelBufferRef pixelBuffer = self.arView.session.currentFrame.capturedImage;
     CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
-    
+
     CIContext *temporaryContext = [CIContext contextWithOptions:nil];
     CGImageRef videoImage = [temporaryContext
                              createCGImage:ciImage
                              fromRect:CGRectMake(0, 0,
                                                  CVPixelBufferGetWidth(pixelBuffer),
                                                  CVPixelBufferGetHeight(pixelBuffer))];
-    
+
     UIImage *image = [UIImage imageWithCGImage:videoImage scale: 1.0 orientation:UIImageOrientationRight];
     CGImageRelease(videoImage);
-    
+
     UIImage *cropped = [self cropImage:image toSelection:selection];
     return cropped;
-    
+
 }
 
 
@@ -449,11 +449,11 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 - (UIImage *)cropImage:(UIImage *)imageToCrop toRect:(CGRect)rect
 {
     //CGRect CropRect = CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height+15);
-    
+
     CGImageRef imageRef = CGImageCreateWithImageInRect([imageToCrop CGImage], rect);
     UIImage *cropped = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
-    
+
     return cropped;
 }
 
@@ -461,7 +461,7 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
 UIImage* rotate(UIImage* src, UIImageOrientation orientation)
 {
     UIGraphicsBeginImageContext(src.size);
-    
+
     CGContextRef context = UIGraphicsGetCurrentContext();
     [src drawAtPoint:CGPointMake(0, 0)];
     if (orientation == UIImageOrientationRight) {
@@ -473,37 +473,37 @@ UIImage* rotate(UIImage* src, UIImageOrientation orientation)
     } else if (orientation == UIImageOrientationUp) {
         CGContextRotateCTM (context, radians(90));
     }
-    
-    
-    
+
+
+
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
 }
 - (UIImage *)cropImage:(UIImage *)imageToCrop toSelection:(NSDictionary *)selection
 {
-    
+
     // selection is in view-coordinate system
     // where as the image is a camera picture with arbitary size
     // also, the camera picture is cut of so that it "covers" the self.bounds
     // if selection is nil, crop to the viewport
-    
+
     UIImage * image = rotate(imageToCrop, imageToCrop.imageOrientation);
-    
+
     float arViewWidth = self.bounds.size.width;
     float arViewHeight = self.bounds.size.height;
     float imageWidth = image.size.width;
     float imageHeight = image.size.height;
-    
+
     float arViewRatio = arViewHeight/arViewWidth;
     float imageRatio = imageHeight/imageWidth;
     float imageToArWidth = imageWidth/arViewWidth;
     float imageToArHeight = imageHeight/arViewHeight;
-    
+
     float finalHeight;
     float finalWidth;
-    
-    
+
+
     if (arViewRatio > imageRatio)
     {
         finalHeight = arViewHeight*imageToArHeight;
@@ -514,11 +514,11 @@ UIImage* rotate(UIImage* src, UIImageOrientation orientation)
         finalWidth = arViewWidth*imageToArWidth;
         finalHeight = arViewWidth * imageToArWidth * arViewRatio;
     }
-    
+
     float topOffset = (image.size.height - finalHeight)/2;
     float leftOffset = (image.size.width - finalWidth)/2;
-    
-    
+
+
     float x = leftOffset;
     float y = topOffset;
     float width = finalWidth;
@@ -530,7 +530,7 @@ UIImage* rotate(UIImage* src, UIImageOrientation orientation)
         height = [selection[@"height"] floatValue]*imageToArHeight;
     }
     CGRect rect = CGRectMake(x, y, width, height);
-    
+
     UIImage *cropped = [self cropImage:image toRect:rect];
     return cropped;
 }
@@ -539,7 +539,7 @@ UIImage* rotate(UIImage* src, UIImageOrientation orientation)
 #pragma mark - plane hit detection
 
 - (void)hitTestPlane:(const CGPoint)tapPoint types:(ARHitTestResultType)types resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject {
-    
+
     resolve([self getPlaneHitResult:tapPoint types:types]);
 }
 
@@ -568,7 +568,7 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
         NSDictionary * planeHitResult = [self getPlaneHitResult:tapPoint types:ARHitTestResultTypeExistingPlaneUsingExtent];
         self.onTapOnPlaneUsingExtent(planeHitResult);
     }
-    
+
     if(self.onTapOnPlaneNoExtent) {
         // Take the screen space tap coordinates    and pass them to the hitTest method on the ARSCNView instance
         NSDictionary * planeHitResult = [self getPlaneHitResult:tapPoint types:ARHitTestResultTypeExistingPlane];
@@ -610,7 +610,7 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
                                 @"positionAbsolute": vectorToJson(node.position)
                                 };
     NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:baseProps];
-    
+
     if([anchor isKindOfClass:[ARPlaneAnchor class]]) {
         ARPlaneAnchor *planeAnchor = (ARPlaneAnchor *)anchor;
         NSDictionary * planeProperties = [self makePlaneAnchorProperties:planeAnchor];
@@ -637,7 +637,7 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
              @"center": vector_float3ToJson(planeAnchor.center),
              @"extent": vector_float3ToJson(planeAnchor.extent)
              };
-    
+
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110300
@@ -647,51 +647,51 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
              @"image": @{
                      @"name": imageAnchor.referenceImage.name
                      }
-             
+
              };
-    
+
 }
   #endif
 
 - (void)addRendererDelegates:(id) delegate {
      [self.rendererDelegates addObject:delegate];
-    NSLog(@"added, number of renderer delegates %d", [self.rendererDelegates count]);
+    // NSLog(@"added, number of renderer delegates %d", [self.rendererDelegates count]);
 }
 
 - (void)removeRendererDelegates:(id) delegate {
     [self.rendererDelegates removeObject:delegate];
-     NSLog(@"removed, number of renderer delegates %d", [self.rendererDelegates count]);
+    //  NSLog(@"removed, number of renderer delegates %d", [self.rendererDelegates count]);
 }
 - (void)renderer:(id <SCNSceneRenderer>)renderer willUpdateNode:(SCNNode *)node forAnchor:(ARAnchor *)anchor {
 }
 
 
 - (void)renderer:(id <SCNSceneRenderer>)renderer didAddNode:(SCNNode *)node forAnchor:(ARAnchor *)anchor {
-    
+
     NSDictionary *anchorDict = [self makeAnchorDetectionResult:node anchor:anchor];
-    
+
     if (self.onPlaneDetected && [anchor isKindOfClass:[ARPlaneAnchor class]]) {
         self.onPlaneDetected(anchorDict);
     } else if (self.onAnchorDetected) {
         self.onAnchorDetected(anchorDict);
     }
-    
+
 }
 
 - (void)renderer:(id <SCNSceneRenderer>)renderer didUpdateNode:(SCNNode *)node forAnchor:(ARAnchor *)anchor {
     NSDictionary *anchorDict = [self makeAnchorDetectionResult:node anchor:anchor];
-    
+
     if (self.onPlaneUpdated && [anchor isKindOfClass:[ARPlaneAnchor class]]) {
         self.onPlaneUpdated(anchorDict);
     }else if (self.onAnchorUpdated) {
         self.onAnchorUpdated(anchorDict);
     }
-    
+
 }
 
 - (void)renderer:(id<SCNSceneRenderer>)renderer didRemoveNode:(SCNNode *)node forAnchor:(ARAnchor *)anchor {
     NSDictionary *anchorDict = [self makeAnchorDetectionResult:node anchor:anchor];
-    
+
     if (self.onPlaneRemoved && [anchor isKindOfClass:[ARPlaneAnchor class]]) {
         self.onPlaneRemoved(anchorDict);
     } else if (self.onAnchorRemoved) {
@@ -719,14 +719,14 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
         vector_float3 positionV = [self currentFrame].rawFeaturePoints.points[i];
         SCNVector3 position = [self.nodeManager getRelativePositionToOrigin:SCNVector3Make(positionV[0],positionV[1],positionV[2])];
         NSString * pointId = [NSString stringWithFormat:@"featurepoint_%lld",[self currentFrame].rawFeaturePoints.identifiers[i]];
-        
+
         [featurePoints addObject:@{
                                    @"x": @(position.x),
                                    @"y": @(position.y),
                                    @"z": @(position.z),
                                    @"id":pointId,
                                    }];
-        
+
     }
     return featurePoints;
 }
@@ -740,8 +740,8 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
     if (self.onFeaturesDetected) {
         NSArray * featurePoints = [self getCurrentDetectedFeaturePoints];
         dispatch_async(dispatch_get_main_queue(), ^{
-            
-            
+
+
             if(self.onFeaturesDetected) {
                 self.onFeaturesDetected(@{
                                           @"featurePoints":featurePoints
@@ -749,21 +749,21 @@ static NSDictionary * getPlaneHitResult(NSMutableArray *resultsMapped, const CGP
             }
         });
     }
-    
+
     if (self.lightEstimationEnabled && self.onLightEstimation) {
         /** this is called rapidly and is therefore demanding, better poll it from outside with getCurrentLightEstimation **/
-        
-        
-        
+
+
+
         dispatch_async(dispatch_get_main_queue(), ^{
             if(self.onLightEstimation) {
                 NSDictionary *estimate = [self getCurrentLightEstimation];
                 self.onLightEstimation(estimate);
             }
         });
-        
+
     }
-    
+
 }
 
 - (NSDictionary *)wrapLightEstimation:(ARLightEstimate *)estimate {

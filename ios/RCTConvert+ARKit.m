@@ -469,7 +469,7 @@
     if (json[@"diffuse"]) {
         [self setMaterialPropertyContents:json[@"diffuse"] material:material.diffuse];
     }
-  
+
     if (json[@"ambient"]) {
       [self setMaterialPropertyContents:json[@"ambient"] material:material.ambient];
     }
