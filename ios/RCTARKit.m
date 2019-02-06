@@ -50,9 +50,15 @@ static RCTARKit *instance = nil;
     
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-          RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
           ARSCNView *arView = [[ARSCNView alloc] init];
-          instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
+          // TODO: @hcwiley how are going to handle this right?
+          bool useSixDegreesSDK = false;
+          if( useSixDegreesSDK ){
+            RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
+            instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
+          } else {
+            instance = [[self alloc] initWithARView:arView];
+          }
         }
     });
     
@@ -66,8 +72,7 @@ static RCTARKit *instance = nil;
 
 - (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView {
   if ((self = [super init])) {
-    
-    self.useSixDegreesSDK = YES;
+
     self.sixDegressManager = sixDegreesView;
     [self addSubview:self.sixDegressManager];
 
