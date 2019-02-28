@@ -335,19 +335,86 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
 
 
 - (NSDictionary *)readCamera {
-  
     SCNVector3 position = self.arView.pointOfView.position;
     SCNVector4 rotation = self.arView.pointOfView.rotation;
     SCNVector4 orientation = self.arView.pointOfView.orientation;
     SCNVector3 eulerAngles = self.arView.pointOfView.eulerAngles;
-//    SCNVector3 direction = self.nodeManager.cameraDirection;
+    SCNVector3 direction = self.nodeManager.cameraDirection;
     return @{
              @"position":vectorToJson(position),
              @"rotation":vector4ToJson(rotation),
              @"orientation":vector4ToJson(orientation),
              @"eulerAngles":vectorToJson(eulerAngles),
-//             @"direction":vectorToJson(direction),
+             @"direction":vectorToJson(direction),
              };
+}
+
+- (NSDictionary *) projectAlongCamera: (NSDictionary*) nodeDict {
+  // SCNVector3 point = SCNVector3Make(  [pointDict[@"x"] floatValue], [pointDict[@"y"] floatValue], [pointDict[@"z"] floatValue] );
+  SCNMatrix4 nodeMat = SCNMatrix4Identity;
+  SCNVector3 nodePosition = SCNVector3Zero;
+  // Check if we got a position to set our matrix
+  if( [nodeDict objectForKey:@"position"] ){
+    nodePosition = SCNVector3Make(  [nodeDict[@"position"][@"x"] floatValue], [nodeDict[@"position"][@"y"] floatValue], [nodeDict[@"position"][@"z"] floatValue] );
+    nodeMat = SCNMatrix4MakeTranslation(nodePosition.x, nodePosition.y, nodePosition.z);
+  }
+
+  // We prefer an orientation
+  SCNVector4 nodeOrientation = SCNVector4Zero;
+  if( [nodeDict objectForKey:@"orientation"] ){
+    nodeOrientation = SCNVector4Make(
+                                     [nodeDict[@"orientation"][@"x"] floatValue],
+                                     [nodeDict[@"orientation"][@"y"] floatValue],
+                                     [nodeDict[@"orientation"][@"z"] floatValue],
+                                     [nodeDict[@"orientation"][@"w"] floatValue]
+                                     );
+    GLKQuaternion quat = GLKQuaternionMake(nodeOrientation.x,nodeOrientation.y, nodeOrientation.z, nodeOrientation.w);
+    // Apply the position and orientation together
+    nodeMat = SCNMatrix4Mult(nodeMat, SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(quat)));
+  } else {
+    // fall back to rotation
+    SCNVector4 nodeRotation = SCNVector4Zero;
+    if( [nodeDict objectForKey:@"rotation"] ){
+      nodeRotation = SCNVector4Make(
+                                    [nodeDict[@"rotation"][@"x"] floatValue],
+                                    [nodeDict[@"rotation"][@"y"] floatValue],
+                                    [nodeDict[@"rotation"][@"z"] floatValue],
+                                    [nodeDict[@"rotation"][@"w"] floatValue]
+                                    );
+      // Apply the position and rotation together
+      nodeMat = SCNMatrix4Mult(nodeMat, SCNMatrix4MakeRotation(nodeRotation.w, nodeRotation.x, nodeRotation.y, nodeRotation.z));
+    } else {
+      SCNVector3 nodeEulerAngles = SCNVector3Zero;
+      if( [nodeDict objectForKey:@"eulerAngles"] ){
+        nodeEulerAngles = SCNVector3Make(
+                                         [nodeDict[@"eulerAngles"][@"x"] floatValue],
+                                         [nodeDict[@"eulerAngles"][@"y"] floatValue],
+                                         [nodeDict[@"eulerAngles"][@"z"] floatValue]
+                                         );
+        // Apply the position and rotation together
+        SCNMatrix4 rotMat = SCNMatrix4MakeRotation(nodeRotation.x, 1, 0, 0);
+        rotMat = SCNMatrix4Mult(nodeMat, SCNMatrix4MakeRotation(nodeRotation.y, 0, 1, 0));
+        rotMat = SCNMatrix4Mult(nodeMat, SCNMatrix4MakeRotation(nodeRotation.z, 0, 0, 1));
+        nodeMat = SCNMatrix4Mult(nodeMat, SCNMatrix4MakeRotation(nodeRotation.w, nodeRotation.x, nodeRotation.y, nodeRotation.z));
+      }
+    }
+  }
+
+  // Apply the node matrix to cameras transform
+  nodeMat = SCNMatrix4Mult(nodeMat, self.arView.pointOfView.transform);
+  SCNNode* tmpNode = [SCNNode node];
+  [tmpNode setTransform:nodeMat];
+
+  SCNVector3 position = tmpNode.position;
+  SCNVector4 rotation = tmpNode.rotation;
+  SCNVector4 orientation = tmpNode.orientation;
+  SCNVector3 eulerAngles = tmpNode.eulerAngles;
+  return @{
+           @"position":vectorToJson(position),
+           @"rotation":vector4ToJson(rotation),
+           @"orientation":vector4ToJson(orientation),
+           @"eulerAngles":vectorToJson(eulerAngles),
+           };
 }
 
 - (SCNVector3)projectPoint:(SCNVector3)point {

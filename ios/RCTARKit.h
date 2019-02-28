@@ -84,6 +84,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (void)moveNodeToCamera:(NSString *)nodeId;
 - (NSDictionary *)readCameraPosition;
 - (NSDictionary *)readCamera;
+- (NSDictionary *) projectAlongCamera: (NSDictionary*) nodeDict;
 - (NSDictionary* )getCurrentLightEstimation;
 - (NSArray * )getCurrentDetectedFeaturePoints;
 - (bool)isMounted;
