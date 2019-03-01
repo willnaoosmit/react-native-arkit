@@ -7,7 +7,7 @@ export default ARComponent => {
   // there is a strange issue: animatedvalues can't be child objects,
   // so we have to flatten them
   // we would need to have an Animated.ValueXYZ
-  const ANIMATEABLE3D = ['position', 'eulerAngles', 'rotation'];
+  const ANIMATEABLE3D = ['position', 'eulerAngles', 'rotation', 'orientation'];
 
   const ARComponentAnimatedInner = Animated.createAnimatedComponent(
     class extends React.PureComponent {

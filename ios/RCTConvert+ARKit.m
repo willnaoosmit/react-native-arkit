@@ -556,9 +556,6 @@
     } else {
         [SCNTransaction setAnimationDuration:0.0];
     }
-    if (json[@"position"]) {
-        node.position = [self SCNVector3:json[@"position"]];
-    }
 
     if (json[@"scale"]) {
 
@@ -578,6 +575,10 @@
     if (json[@"rotation"]) {
         node.rotation = [self SCNVector4:json[@"rotation"]];
     }
+
+  if (json[@"position"]) {
+    node.position = [self SCNVector3:json[@"position"]];
+  }
 
     if (json[@"opacity"]) {
         node.opacity = [json[@"opacity"] floatValue];
