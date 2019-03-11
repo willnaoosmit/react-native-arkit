@@ -404,127 +404,126 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
   SCNVector4 rotation = SCNVector4Zero;
   SCNVector4 orientation = SCNVector4Zero;
   SCNVector3 eulerAngles = SCNVector3Zero;
-
-  GLKMatrix3 modelRotationMatrix = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(nodeMat));
-  GLKVector3 modelXAxis = GLKVector3Make(modelRotationMatrix.m00, modelRotationMatrix.m01, modelRotationMatrix.m02);
-  GLKVector3 modelYAxis = GLKVector3Make(modelRotationMatrix.m10, modelRotationMatrix.m11, modelRotationMatrix.m12);
-
-  const GLKVector3 yUp = modelYAxis;//GLKVector3Make(0.0, 1.0, 0.0);
-
-  // Calculate the direction of the camera. So get the rotation and multiply it by the look forward (along the z)
-  // cameraToWorld
-  GLKMatrix3 camToWorldMat = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform));
-  bool inveretable;
-  GLKMatrix3 worldToCamMat = GLKMatrix3Invert(camToWorldMat, &inveretable);
-  GLKVector3 cameraXAxis = GLKVector3Make(camToWorldMat.m00, camToWorldMat.m01, camToWorldMat.m02);
-  // Crystal math.
-  GLKVector3 camLookAtWorld = GLKMatrix3MultiplyVector3(camToWorldMat, GLKVector3Make(0.0, 0.0, -1.0));
-  camLookAtWorld = GLKVector3Normalize(camLookAtWorld);
-
-  GLKVector3 camLookUpWorld = GLKMatrix3MultiplyVector3(camToWorldMat, yUp);
-  camLookUpWorld = GLKVector3Normalize(camLookUpWorld);
-
-  GLKVector3 camLookAtCam = GLKMatrix3MultiplyVector3(worldToCamMat, GLKVector3Make(0.0, 0.0, -1.0));
-  camLookAtCam = GLKVector3Normalize(camLookAtCam);
-
-  // Get world up in camera
-  GLKVector3 worldUpInCam = GLKMatrix3MultiplyVector3(worldToCamMat, yUp);
-  worldUpInCam = GLKVector3Normalize(worldUpInCam);
-
-  // Axis between node to camera in world space and camera look up in world
-  GLKVector3 worldUpInCameraAndCameraUp = GLKVector3CrossProduct(worldUpInCam, yUp);
-  worldUpInCameraAndCameraUp = GLKVector3Normalize(worldUpInCameraAndCameraUp);
-
-  GLKQuaternion quat;
-
-  // Get the full projected position by rotating the nodePosition in camera space with the cam transform 4x4
-  GLKVector4 full = GLKMatrix4MultiplyVector4(
-                                              SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform),
-                                              GLKVector4Make(nodePosition.x, nodePosition.y, nodePosition.z, 1.0));
-  nodeWorldPosition = SCNVector3Make(full.x, full.y, full.z);
-
-  SCNVector3 cameraPosition = self.arView.pointOfView.position;
-  GLKVector3 nodeToCamWorldVector = GLKVector3Subtract(
-                                                       SCNVector3ToGLKVector3(nodeWorldPosition),
-                                                       SCNVector3ToGLKVector3(cameraPosition)
-                                                       );
-  nodeToCamWorldVector = GLKVector3Normalize(nodeToCamWorldVector);
-
-
-  GLKVector3 axis = GLKVector3CrossProduct(camLookAtCam, worldUpInCam);
-  axis = GLKVector3Normalize(axis);
-  GLKVector3 upDiffInCam = GLKVector3Subtract(worldUpInCam,
-                                              yUp);
-  float pitchRads = acos(GLKVector3DotProduct(
-                                              yUp,
-                                              worldUpInCam
-                                              )/ (
-                                                  GLKVector3Length(yUp) * GLKVector3Length(worldUpInCam)
-                                                  )
-                         );
-  quat = GLKQuaternionMakeWithAngleAndAxis(pitchRads, axis.x, axis.y, axis.z);
-
-  // Rotate the node in camera space to match the y up vector of the world
-
-//  if( true ){
-//    float camWorldUpDiffInCam = GLKVector3DotProduct(yUp, worldUpInCam);
-//    float pitchRads = acos(camWorldUpDiffInCam);
-//
-//    quat = GLKQuaternionMakeWithAngleAndAxis(pitchRads, worldUpInCameraAndCameraUp.x, worldUpInCameraAndCameraUp.y, worldUpInCameraAndCameraUp.z);
-//  } else {
-//    // Axis between node to camera in world space and camera look up in world
-//    GLKVector3 axis = GLKVector3CrossProduct(nodeToCamWorldVector, camLookUpWorld);
-//    axis = GLKVector3Normalize(axis);
-////    quat = GLKQuaternionMakeWithAngleAndAxis(pitchRads, axis.x, axis.y, axis.z);
-//  }
-
+  
   SCNNode* groupNode = [SCNNode node];
   SCNNode* cameraNode = [SCNNode node];
   [groupNode addChildNode:cameraNode];
   cameraNode.transform = self.arView.pointOfView.transform;
-  SCNNode* tmpNode = [SCNNode node];
-  [groupNode addChildNode:tmpNode];
-
-  [cameraNode addChildNode:tmpNode];
-//   tmpNode.transform = nodeMat;
-//  tmpNode.rotation = SCNVector4Make(axis.x, axis.y, axis.z, pitchRads);
-  tmpNode.transform = SCNMatrix4Mult(
-                                     SCNMatrix4MakeRotation(pitchRads, axis.x, axis.y, axis.z),
-                                     nodeMat
-                                     );
-
-//  tmpNode.position = SCNVector3Make(nodePosition.x,
-//                                    nodePosition.y,
-//                                    nodePosition.z);
-//  tmpNode.orientation = SCNVector4Make(quat.x, quat.y, quat.z, quat.w);
-//  tmpNode.transform = SCNMatrix4Translate(
-//                                          SCNMatrix4MakeRotation(pitchRads, axis.x, axis.y, axis.z),
-//
-//                                          );
-//  tmpNode.orientation = SCNVector4Make(-1,0,0,0.7853982);
-//
-
-  NSLog(@"project: \n\n");
-  NSLog(@"\nproject full clc position:\t% 01.2f\t% 01.2f\t% 01.2f\n", nodeWorldPosition.x, nodeWorldPosition.y, nodeWorldPosition.z);
-  NSLog(@"\nproject tmpNode position:\t% 01.2f\t% 01.2f\t% 01.2f\n", tmpNode.position.x, tmpNode.position.y, tmpNode.position.z);
-  NSLog(@"\nproject tmpNode world po:\t% 01.2f\t% 01.2f\t% 01.2f\n", tmpNode.worldPosition.x, tmpNode.worldPosition.y, tmpNode.worldPosition.z);
-
-  rotation = tmpNode.rotation;
-  orientation = tmpNode.worldOrientation;
-  eulerAngles = tmpNode.eulerAngles;
-
-//  SCNVector3 modelYToCamera = [tmpNode convertVector:SCNVector3FromGLKVector3(modelYAxis) toNode:cameraNode];
-//  NSLog(@"project modelYToCamera:\t% 01.2f, % 01.2f, % 01.2f", modelYToCamera.x, modelYToCamera.y, modelYToCamera.z);
-
-  NSLog(@"\nproject tmpNode rotation:\t% 01.2f, % 01.2f, % 01.2f, % 01.2f\n", tmpNode.rotation.x, tmpNode.rotation.y, tmpNode.rotation.z, tmpNode.rotation.w);
-  NSLog(@"\nproject tmpNode world orine:\t% 01.2f, % 01.2f, % 01.2f, % 01.2f\n", tmpNode.worldOrientation.x, tmpNode.worldOrientation.y, tmpNode.worldOrientation.z, tmpNode.worldOrientation.w);
-   NSLog(@"\nproject tmpNode orientation:\t% 01.2f, % 01.2f, % 01.2f, % 01.2f\n", tmpNode.orientation.x, tmpNode.orientation.y, tmpNode.orientation.z, tmpNode.orientation.w);
-
+  
+  // TODO: figure out wtf is going on with model placement along projected camera
+  // Just using the camera for now until we get the model rotation placement issue sorted out
+  if( true ){
+    rotation = cameraNode.rotation;
+    orientation = cameraNode.orientation;
+    eulerAngles = cameraNode.eulerAngles;
+  } else {
+    
+    
+    // Rotate the node in camera space to match the y up vector of the world
+    
+    GLKMatrix3 modelRotationMatrix = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(nodeMat));
+    GLKVector3 modelXAxis = GLKVector3Make(modelRotationMatrix.m00, modelRotationMatrix.m01, modelRotationMatrix.m02);
+    GLKVector3 modelYAxis = GLKVector3Make(modelRotationMatrix.m10, modelRotationMatrix.m11, modelRotationMatrix.m12);
+    
+    const GLKVector3 yUp = modelYAxis;//GLKVector3Make(0.0, 1.0, 0.0);
+    
+    // Calculate the direction of the camera. So get the rotation and multiply it by the look forward (along the z)
+    // cameraToWorld
+    GLKMatrix3 camToWorldMat = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform));
+    bool inveretable;
+    GLKMatrix3 worldToCamMat = GLKMatrix3Invert(camToWorldMat, &inveretable);
+    GLKVector3 cameraXAxis = GLKVector3Make(camToWorldMat.m00, camToWorldMat.m01, camToWorldMat.m02);
+    // Crystal math.
+    GLKVector3 camLookAtWorld = GLKMatrix3MultiplyVector3(camToWorldMat, GLKVector3Make(0.0, 0.0, -1.0));
+    camLookAtWorld = GLKVector3Normalize(camLookAtWorld);
+    
+    GLKVector3 camLookUpWorld = GLKMatrix3MultiplyVector3(camToWorldMat, yUp);
+    camLookUpWorld = GLKVector3Normalize(camLookUpWorld);
+    
+    GLKVector3 camLookAtCam = GLKMatrix3MultiplyVector3(worldToCamMat, GLKVector3Make(0.0, 0.0, -1.0));
+    camLookAtCam = GLKVector3Normalize(camLookAtCam);
+    
+    // Get world up in camera
+    GLKVector3 worldUpInCam = GLKMatrix3MultiplyVector3(worldToCamMat, yUp);
+    worldUpInCam = GLKVector3Normalize(worldUpInCam);
+    
+    // Axis between node to camera in world space and camera look up in world
+    GLKVector3 worldUpInCameraAndCameraUp = GLKVector3CrossProduct(worldUpInCam, yUp);
+    worldUpInCameraAndCameraUp = GLKVector3Normalize(worldUpInCameraAndCameraUp);
+    
+    GLKQuaternion quat;
+    
+    // Get the full projected position by rotating the nodePosition in camera space with the cam transform 4x4
+    GLKVector4 full = GLKMatrix4MultiplyVector4(
+                                                SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform),
+                                                GLKVector4Make(nodePosition.x, nodePosition.y, nodePosition.z, 1.0));
+    nodeWorldPosition = SCNVector3Make(full.x, full.y, full.z);
+    
+    SCNVector3 cameraPosition = self.arView.pointOfView.position;
+    GLKVector3 nodeToCamWorldVector = GLKVector3Subtract(
+                                                         SCNVector3ToGLKVector3(nodeWorldPosition),
+                                                         SCNVector3ToGLKVector3(cameraPosition)
+                                                         );
+    nodeToCamWorldVector = GLKVector3Normalize(nodeToCamWorldVector);
+    
+    
+    GLKVector3 axis = GLKVector3CrossProduct(camLookAtCam, worldUpInCam);
+    axis = GLKVector3Normalize(axis);
+    GLKVector3 upDiffInCam = GLKVector3Subtract(worldUpInCam,
+                                                yUp);
+    float pitchRads = acos(GLKVector3DotProduct(
+                                                yUp,
+                                                worldUpInCam
+                                                )/ (
+                                                    GLKVector3Length(yUp) * GLKVector3Length(worldUpInCam)
+                                                    )
+                           );
+    quat = GLKQuaternionMakeWithAngleAndAxis(pitchRads, axis.x, axis.y, axis.z);
+    
+    SCNNode* tmpNode = [SCNNode node];
+    [groupNode addChildNode:tmpNode];
+    
+    [cameraNode addChildNode:tmpNode];
+    //   tmpNode.transform = nodeMat;
+    //  tmpNode.rotation = SCNVector4Make(axis.x, axis.y, axis.z, pitchRads);
+    tmpNode.transform = SCNMatrix4Mult(
+                                       SCNMatrix4MakeRotation(pitchRads, axis.x, axis.y, axis.z),
+                                       nodeMat
+                                       );
+    
+    //  tmpNode.position = SCNVector3Make(nodePosition.x,
+    //                                    nodePosition.y,
+    //                                    nodePosition.z);
+    //  tmpNode.orientation = SCNVector4Make(quat.x, quat.y, quat.z, quat.w);
+    //  tmpNode.transform = SCNMatrix4Translate(
+    //                                          SCNMatrix4MakeRotation(pitchRads, axis.x, axis.y, axis.z),
+    //
+    //                                          );
+    //  tmpNode.orientation = SCNVector4Make(-1,0,0,0.7853982);
+    //
+    
+    NSLog(@"project: \n\n");
+    NSLog(@"\nproject full clc position:\t% 01.2f\t% 01.2f\t% 01.2f\n", nodeWorldPosition.x, nodeWorldPosition.y, nodeWorldPosition.z);
+    NSLog(@"\nproject tmpNode position:\t% 01.2f\t% 01.2f\t% 01.2f\n", tmpNode.position.x, tmpNode.position.y, tmpNode.position.z);
+    NSLog(@"\nproject tmpNode world po:\t% 01.2f\t% 01.2f\t% 01.2f\n", tmpNode.worldPosition.x, tmpNode.worldPosition.y, tmpNode.worldPosition.z);
+    
+    rotation = tmpNode.rotation;
+    orientation = tmpNode.worldOrientation;
+    eulerAngles = tmpNode.eulerAngles;
+    
+    //  SCNVector3 modelYToCamera = [tmpNode convertVector:SCNVector3FromGLKVector3(modelYAxis) toNode:cameraNode];
+    //  NSLog(@"project modelYToCamera:\t% 01.2f, % 01.2f, % 01.2f", modelYToCamera.x, modelYToCamera.y, modelYToCamera.z);
+    
+    NSLog(@"\nproject tmpNode rotation:\t% 01.2f, % 01.2f, % 01.2f, % 01.2f\n", tmpNode.rotation.x, tmpNode.rotation.y, tmpNode.rotation.z, tmpNode.rotation.w);
+    NSLog(@"\nproject tmpNode world orine:\t% 01.2f, % 01.2f, % 01.2f, % 01.2f\n", tmpNode.worldOrientation.x, tmpNode.worldOrientation.y, tmpNode.worldOrientation.z, tmpNode.worldOrientation.w);
+    NSLog(@"\nproject tmpNode orientation:\t% 01.2f, % 01.2f, % 01.2f, % 01.2f\n", tmpNode.orientation.x, tmpNode.orientation.y, tmpNode.orientation.z, tmpNode.orientation.w);
+    
+  }
   return @{
            @"position":vectorToJson(nodeWorldPosition),
            @"rotation":vector4ToJson(rotation),
            @"orientation":vector4ToJson(orientation),
-//           @"eulerAngles":vectorToJson(eulerAngles),
+           //           @"eulerAngles":vectorToJson(eulerAngles),
            };
 }
 
