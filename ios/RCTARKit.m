@@ -404,6 +404,12 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
   SCNVector4 rotation = SCNVector4Zero;
   SCNVector4 orientation = SCNVector4Zero;
   SCNVector3 eulerAngles = SCNVector3Zero;
+
+  // Get the full projected position by rotating the nodePosition in camera space with the cam transform 4x4
+  GLKVector4 full = GLKMatrix4MultiplyVector4(
+                                              SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform),
+                                              GLKVector4Make(nodePosition.x, nodePosition.y, nodePosition.z, 1.0));
+  nodeWorldPosition = SCNVector3Make(full.x, full.y, full.z);
   
   SCNNode* groupNode = [SCNNode node];
   SCNNode* cameraNode = [SCNNode node];
