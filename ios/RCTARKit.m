@@ -419,9 +419,17 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
   // TODO: figure out wtf is going on with model placement along projected camera
   // Just using the camera for now until we get the model rotation placement issue sorted out
   if( true ){
-    rotation = cameraNode.rotation;
-    orientation = cameraNode.orientation;
-    eulerAngles = cameraNode.eulerAngles;
+    SCNNode* tmpNode = [SCNNode node];
+    tmpNode.position = SCNVector3Make(nodePosition.x,
+                                      nodePosition.y,
+                                      nodePosition.z);
+    [groupNode addChildNode:tmpNode];
+    [cameraNode addChildNode:tmpNode];
+
+    nodeWorldPosition = tmpNode.position;
+    rotation = tmpNode.rotation;
+    orientation = tmpNode.orientation;
+    eulerAngles = tmpNode.eulerAngles;
   } else {
     
     
