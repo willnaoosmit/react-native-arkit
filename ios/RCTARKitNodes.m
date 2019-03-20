@@ -405,7 +405,7 @@ static id ObjectOrNull(id object)
         properties:(NSDictionary *) properties {
     
     SCNNode *node = [self getNodeWithId:nodeId];
-     NSLog(@"updating node %@ :%@", nodeId, properties);
+//     NSLog(@"updating node %@ :%@", nodeId, properties);
     if(node) {
         [RCTConvert setNodeProperties:node properties:properties];
         if(node.geometry && properties[@"shape"]) {

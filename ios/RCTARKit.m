@@ -400,16 +400,46 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
       }
     }
   }
-  SCNVector3 nodeWorldPosition = SCNVector3Zero;
+  SCNVector3 position = SCNVector3Zero;
   SCNVector4 rotation = SCNVector4Zero;
   SCNVector4 orientation = SCNVector4Zero;
   SCNVector3 eulerAngles = SCNVector3Zero;
+
+  GLKMatrix3 modelRotationMatrix = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(nodeMat));
+  GLKVector3 modelXAxis = GLKVector3Make(modelRotationMatrix.m00, modelRotationMatrix.m01, modelRotationMatrix.m02);
+  GLKVector3 modelYAxis = GLKVector3Make(modelRotationMatrix.m10, modelRotationMatrix.m11, modelRotationMatrix.m12);
+
+  const GLKVector3 yUp = modelYAxis;//GLKVector3Make(0.0, 1.0, 0.0);
+
+  // Calculate the direction of the camera. So get the rotation and multiply it by the look forward (along the z)
+  // cameraToWorld
+  GLKMatrix3 camToWorldMat = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform));
+  bool inveretable;
+  GLKMatrix3 worldToCamMat = GLKMatrix3Invert(camToWorldMat, &inveretable);
+  GLKVector3 cameraXAxis = GLKVector3Make(camToWorldMat.m00, camToWorldMat.m01, camToWorldMat.m02);
+  // Crystal math.
+  GLKVector3 camLookAtWorld = GLKMatrix3MultiplyVector3(camToWorldMat, GLKVector3Make(0.0, 0.0, -1.0));
+  camLookAtWorld = GLKVector3Normalize(camLookAtWorld);
+
+  GLKVector3 camLookUpWorld = GLKMatrix3MultiplyVector3(camToWorldMat, yUp);
+  camLookUpWorld = GLKVector3Normalize(camLookUpWorld);
+
+  GLKVector3 camLookAtCam = GLKMatrix3MultiplyVector3(worldToCamMat, GLKVector3Make(0.0, 0.0, -1.0));
+  camLookAtCam = GLKVector3Normalize(camLookAtCam);
+
+  // Get world up in camera
+  GLKVector3 worldUpInCam = GLKMatrix3MultiplyVector3(worldToCamMat, yUp);
+  worldUpInCam = GLKVector3Normalize(worldUpInCam);
+
+  // Axis between node to camera in world space and camera look up in world
+  GLKVector3 worldUpInCameraAndCameraUp = GLKVector3CrossProduct(worldUpInCam, yUp);
+  worldUpInCameraAndCameraUp = GLKVector3Normalize(worldUpInCameraAndCameraUp);
 
   // Get the full projected position by rotating the nodePosition in camera space with the cam transform 4x4
   GLKVector4 full = GLKMatrix4MultiplyVector4(
                                               SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform),
                                               GLKVector4Make(nodePosition.x, nodePosition.y, nodePosition.z, 1.0));
-  nodeWorldPosition = SCNVector3Make(full.x, full.y, full.z);
+  position = SCNVector3Make(full.x, full.y, full.z);
   
   SCNNode* groupNode = [SCNNode node];
   SCNNode* cameraNode = [SCNNode node];
@@ -423,55 +453,25 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
     tmpNode.position = SCNVector3Make(nodePosition.x,
                                       nodePosition.y,
                                       nodePosition.z);
-    [groupNode addChildNode:tmpNode];
     [cameraNode addChildNode:tmpNode];
 
-    nodeWorldPosition = tmpNode.position;
-    rotation = tmpNode.rotation;
-    orientation = tmpNode.orientation;
-    eulerAngles = tmpNode.eulerAngles;
+//      tmpNode.transform = SCNMatrix4MakeTranslation(
+//                                              nodePosition.x,
+//                                              nodePosition.y,
+//                                              nodePosition.z
+//                                              );
+
+    position = tmpNode.worldPosition;
+    orientation = tmpNode.worldOrientation;
   } else {
-    
-    
     // Rotate the node in camera space to match the y up vector of the world
-    
-    GLKMatrix3 modelRotationMatrix = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(nodeMat));
-    GLKVector3 modelXAxis = GLKVector3Make(modelRotationMatrix.m00, modelRotationMatrix.m01, modelRotationMatrix.m02);
-    GLKVector3 modelYAxis = GLKVector3Make(modelRotationMatrix.m10, modelRotationMatrix.m11, modelRotationMatrix.m12);
-    
-    const GLKVector3 yUp = modelYAxis;//GLKVector3Make(0.0, 1.0, 0.0);
-    
-    // Calculate the direction of the camera. So get the rotation and multiply it by the look forward (along the z)
-    // cameraToWorld
-    GLKMatrix3 camToWorldMat = GLKMatrix4GetMatrix3(SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform));
-    bool inveretable;
-    GLKMatrix3 worldToCamMat = GLKMatrix3Invert(camToWorldMat, &inveretable);
-    GLKVector3 cameraXAxis = GLKVector3Make(camToWorldMat.m00, camToWorldMat.m01, camToWorldMat.m02);
-    // Crystal math.
-    GLKVector3 camLookAtWorld = GLKMatrix3MultiplyVector3(camToWorldMat, GLKVector3Make(0.0, 0.0, -1.0));
-    camLookAtWorld = GLKVector3Normalize(camLookAtWorld);
-    
-    GLKVector3 camLookUpWorld = GLKMatrix3MultiplyVector3(camToWorldMat, yUp);
-    camLookUpWorld = GLKVector3Normalize(camLookUpWorld);
-    
-    GLKVector3 camLookAtCam = GLKMatrix3MultiplyVector3(worldToCamMat, GLKVector3Make(0.0, 0.0, -1.0));
-    camLookAtCam = GLKVector3Normalize(camLookAtCam);
-    
-    // Get world up in camera
-    GLKVector3 worldUpInCam = GLKMatrix3MultiplyVector3(worldToCamMat, yUp);
-    worldUpInCam = GLKVector3Normalize(worldUpInCam);
-    
-    // Axis between node to camera in world space and camera look up in world
-    GLKVector3 worldUpInCameraAndCameraUp = GLKVector3CrossProduct(worldUpInCam, yUp);
-    worldUpInCameraAndCameraUp = GLKVector3Normalize(worldUpInCameraAndCameraUp);
-    
     GLKQuaternion quat;
     
     // Get the full projected position by rotating the nodePosition in camera space with the cam transform 4x4
     GLKVector4 full = GLKMatrix4MultiplyVector4(
                                                 SCNMatrix4ToGLKMatrix4(self.arView.pointOfView.transform),
                                                 GLKVector4Make(nodePosition.x, nodePosition.y, nodePosition.z, 1.0));
-    nodeWorldPosition = SCNVector3Make(full.x, full.y, full.z);
+    SCNVector3 nodeWorldPosition = SCNVector3Make(full.x, full.y, full.z);
     
     SCNVector3 cameraPosition = self.arView.pointOfView.position;
     GLKVector3 nodeToCamWorldVector = GLKVector3Subtract(
@@ -534,7 +534,7 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
     
   }
   return @{
-           @"position":vectorToJson(nodeWorldPosition),
+           @"position":vectorToJson(position),
            @"rotation":vector4ToJson(rotation),
            @"orientation":vector4ToJson(orientation),
            //           @"eulerAngles":vectorToJson(eulerAngles),
