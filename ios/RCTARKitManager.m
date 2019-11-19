@@ -9,6 +9,7 @@
 #import "RCTARKitManager.h"
 #import "RCTARKit.h"
 #import "RCTARKitNodes.h"
+#import "RCTARKitIO.h"
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
 #import "color-grabber.h"
@@ -229,6 +230,18 @@ RCT_EXPORT_METHOD(
     [[ARKit sharedInstance] hitTestSceneObjects:point resolve:resolve reject:reject];
 }
 
+
+RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    [[RCTARKitIO sharedInstance] saveScene:[[RCTARKit sharedInstance] scene] as:@"test.obj" finishHandler:^(NSString *filename, NSString *path) {
+        NSLog(@"save happening?");
+        NSLog(@"%@", filename);
+        NSLog(@"%@", path);
+        resolve(@{
+            @"path": path,
+        });
+    }];
+}
 
 
 

@@ -194,10 +194,10 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
       free(faceBuffer);
 //      free(vertices);
 //      free(normals);
-//    } else if (newVersion == 0 && _meshVersion > 0) {
-//      _meshVersion = 0;
-//    }
+    } else if (newVersion == 0 && _meshVersion > 0) {
+      _meshVersion = 0;
+    }
   }
-}
+//}
 
 @end
