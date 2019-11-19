@@ -530,7 +530,7 @@
 }
 
 + (void)setNodeProperties:(SCNNode *)node properties:(id)json {
-
+    
     if (json[@"categoryBitMask"]) {
         node.categoryBitMask = [json[@"categoryBitMask"] integerValue];
     }

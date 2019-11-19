@@ -54,7 +54,7 @@
 
 // Currently just using this as a polling loop
 - (void)drawInMTKView:(nonnull MTKView *)view {
-  if (!SixDegreesSDK_IsInitialized()) {
+  if ([ARKit sharedInstance]) {
     return;
   }
   [self onFrameUpdate];

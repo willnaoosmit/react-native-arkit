@@ -53,6 +53,7 @@ static RCTARKit *instance = nil;
           RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
           ARSCNView *arView = [[ARSCNView alloc] init];
           instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
+        
 //          instance = [[self alloc] initWithARView:arView];
         }
     });
@@ -68,7 +69,7 @@ static RCTARKit *instance = nil;
 - (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView {
   if ((self = [super init])) {
 
-    self.useSixDegreesSDK = YES;
+//    self.useSixDegreesSDK = YES;
     self.sixDegressManager = sixDegreesView;
     [self addSubview:self.sixDegressManager];
 
@@ -217,6 +218,7 @@ static RCTARKit *instance = nil;
   return self.arView ? self.arView.showsStatistics : true;
 }
 
+
 - (void)setDebug:(BOOL)debug {
   if( self.arView ){
     if (debug) {
@@ -270,6 +272,18 @@ static RCTARKit *instance = nil;
     return configuration.lightEstimationEnabled;
 }
 
+//- (BOOL)useSixDegreesSDK {
+//
+//}
+
+//- (void)setUseSixDegreesSDK:(BOOL)useSixDegreesSDK {
+//    BOOL flag = useSixDegreesSDK;
+//    NSLog(flag ? @"Yes" : @"No");
+//    if (self.useSixDegreesSDK == useSixDegreesSDK) {
+//        return;
+//    }
+//    self.useSixDegreesSDK = useSixDegreesSDK;
+//}
 
 - (void)setLightEstimationEnabled:(BOOL)lightEstimationEnabled {
     ARConfiguration *configuration = self.configuration;

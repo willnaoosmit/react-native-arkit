@@ -24,6 +24,8 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 + (instancetype)sharedInstance;
 + (bool)isInitialized;
 - (instancetype)initWithARView:(ARSCNView *)arView;
+- (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView;
+//- (void)hitTestPlane:(CGPoint)tapPoint types:(ARHitTestResultType)types resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject;
 
 
 @property (nonatomic, strong) NSMutableArray<id<RCTARKitTouchDelegate>> *touchDelegates;

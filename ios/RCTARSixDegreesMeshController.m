@@ -8,8 +8,9 @@
 
 #import "RCTARSixDegreesMeshController.h"
 
-
 #import "RCTARKitIO.h"
+#import "RCTARKitManager.h"
+#import "RCTARKit.h"
 #import "RCTARKitNodes.h"
 #import "RCTConvert+ARKit.h"
 
@@ -110,92 +111,99 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
 }
 
 - (void)update {
-//  if( SixDegreesSDK_IsInitialized() ){
-    int blockBufferSize = 0;
-    int vertexBufferSize = 0;
-    int faceBufferSize = 0;
-    int newVersion = SixDegreesSDK_GetBlockMeshInfo(&blockBufferSize, &vertexBufferSize, &faceBufferSize);
+    BOOL isCapturing = [[ARKit sharedInstance] useSixDegreesSDK];
+    if (isCapturing) {
+        NSLog(@"ISCAPTURING");
+    } else {
+        NSLog(@"not capturing");
+    }
+    if (isCapturing) {
+        int blockBufferSize = 0;
+        int vertexBufferSize = 0;
+        int faceBufferSize = 0;
+        int newVersion = SixDegreesSDK_GetBlockMeshInfo(&blockBufferSize, &vertexBufferSize, &faceBufferSize);
 
-    if (newVersion > _meshVersion) {
-      if (blockBufferSize <= 0 ||
-          vertexBufferSize <= 0 ||
-          faceBufferSize <= 0) {
-        return;
-      }
+        if (newVersion > _meshVersion) {
+          if (blockBufferSize <= 0 ||
+              vertexBufferSize <= 0 ||
+              faceBufferSize <= 0) {
+            return;
+          }
 
-      int* blockBuffer = (int*)malloc(blockBufferSize*sizeof(int));
-      float* vertexBuffer = (float*)malloc(vertexBufferSize*sizeof(float));
-      int* faceBuffer = (int*)malloc(faceBufferSize*sizeof(int));
+          int* blockBuffer = (int*)malloc(blockBufferSize*sizeof(int));
+          float* vertexBuffer = (float*)malloc(vertexBufferSize*sizeof(float));
+          int* faceBuffer = (int*)malloc(faceBufferSize*sizeof(int));
 
-      int blockCount = SixDegreesSDK_GetBlockMesh(blockBuffer, vertexBuffer, faceBuffer,
-                                                   blockBufferSize, vertexBufferSize, faceBufferSize);
-      if (blockCount <= 0) {
-        NSLog(@"SixDegreesSDK_GetMeshBlocks() gave us an empty mesh, will not update.");
-        return;
-      }
+          int blockCount = SixDegreesSDK_GetBlockMesh(blockBuffer, vertexBuffer, faceBuffer,
+                                                       blockBufferSize, vertexBufferSize, faceBufferSize);
+          if (blockCount <= 0) {
+            NSLog(@"SixDegreesSDK_GetMeshBlocks() gave us an empty mesh, will not update.");
+            return;
+          }
 
-      if (blockCount != blockBufferSize / 6) {
-        NSLog(@"SixDegreesSDK_GetMeshBlocks() returned %d full blocks, expected %d", blockCount, (blockBufferSize / 6));
-      }
+          if (blockCount != blockBufferSize / 6) {
+            NSLog(@"SixDegreesSDK_GetMeshBlocks() returned %d full blocks, expected %d", blockCount, (blockBufferSize / 6));
+          }
 
-      _meshVersion = newVersion;
+          _meshVersion = newVersion;
 
-      int vertexCount = vertexBufferSize / 6;
-//      SCNVector3* vertices = malloc(vertexCount*sizeof(SCNVector3));
-//      SCNVector3* normals = malloc(vertexCount*sizeof(SCNVector3));
-      SCNVector3* vertices = (SCNVector3*)vertexBuffer;
-      SCNVector3* normals = vertices + vertexCount;
+          int vertexCount = vertexBufferSize / 6;
+    //      SCNVector3* vertices = malloc(vertexCount*sizeof(SCNVector3));
+    //      SCNVector3* normals = malloc(vertexCount*sizeof(SCNVector3));
+          SCNVector3* vertices = (SCNVector3*)vertexBuffer;
+          SCNVector3* normals = vertices + vertexCount;
+            
+          int faceCount = faceBufferSize / 3;
+          NSData* faceData = [NSMutableData dataWithBytes:faceBuffer length:faceBufferSize*sizeof(int)];
+         SCNGeometryElement* element = [SCNGeometryElement geometryElementWithData:faceData
+             primitiveType:SCNGeometryPrimitiveTypeTriangles
+            primitiveCount:faceCount
+             bytesPerIndex:sizeof(int)];
+            
+    //      for (int i = 0; i < vertexCount; i++) {
+    //        vertices[i] = SCNVector3Make(vertexBuffer[6*i], vertexBuffer[6*i+1], vertexBuffer[6*i+2]);
+    //        normals[i] = SCNVector3Make(vertexBuffer[6*i+3], vertexBuffer[6*i+4], vertexBuffer[6*i+5]);
+    //      }
+    //      int faceCount = faceBufferSize / 3;
+    //      NSData* faces = [NSData dataWithBytes:faceBuffer
+    //                                     length:sizeof(int)*faceBufferSize];
+            
+
+          SCNGeometrySource* vertexSource = [SCNGeometrySource geometrySourceWithVertices:vertices
+                                                                                    count:vertexCount];
+          SCNGeometrySource* normalSource = [SCNGeometrySource geometrySourceWithNormals:normals
+                                                                                   count:vertexCount];
         
-      int faceCount = faceBufferSize / 3;
-      NSData* faceData = [NSMutableData dataWithBytes:faceBuffer length:faceBufferSize*sizeof(int)];
-     SCNGeometryElement* element = [SCNGeometryElement geometryElementWithData:faceData
-         primitiveType:SCNGeometryPrimitiveTypeTriangles
-        primitiveCount:faceCount
-         bytesPerIndex:sizeof(int)];
-        
-//      for (int i = 0; i < vertexCount; i++) {
-//        vertices[i] = SCNVector3Make(vertexBuffer[6*i], vertexBuffer[6*i+1], vertexBuffer[6*i+2]);
-//        normals[i] = SCNVector3Make(vertexBuffer[6*i+3], vertexBuffer[6*i+4], vertexBuffer[6*i+5]);
-//      }
-//      int faceCount = faceBufferSize / 3;
-//      NSData* faces = [NSData dataWithBytes:faceBuffer
-//                                     length:sizeof(int)*faceBufferSize];
-        
+          SCNGeometry* geometry = [SCNGeometry geometryWithSources:@[vertexSource, normalSource]
+                                                          elements:@[element]];
+          [geometry setWantsAdaptiveSubdivision:NO];
+            [geometry setFirstMaterial:_meshMaterial];
+    //      if( _matNode && _matNode.geometry.firstMaterial ){
+    //        [geometry setFirstMaterial:_matNode.geometry.firstMaterial];
+    //        _meshMaterial = _matNode.geometry.firstMaterial;
+    //      } else {
+    //        [geometry setFirstMaterial:_meshMaterial];
+    //      }
+          [_meshNode setGeometry:geometry];
+    //      _meshNode.physicsBody = [SCNPhysicsBody
+    //                               bodyWithType:SCNPhysicsBodyTypeStatic
+    //                               shape:[SCNPhysicsShape
+    //                                      shapeWithGeometry:geometry
+    //                                      options:@{
+    //                                                SCNPhysicsShapeKeepAsCompoundKey: @TRUE,
+    //                                                SCNPhysicsShapeTypeKey: SCNPhysicsShapeTypeConcavePolyhedron,
+    //                                                }
+    //                                      ]
+    //                               ];
 
-      SCNGeometrySource* vertexSource = [SCNGeometrySource geometrySourceWithVertices:vertices
-                                                                                count:vertexCount];
-      SCNGeometrySource* normalSource = [SCNGeometrySource geometrySourceWithNormals:normals
-                                                                               count:vertexCount];
-    
-      SCNGeometry* geometry = [SCNGeometry geometryWithSources:@[vertexSource, normalSource]
-                                                      elements:@[element]];
-      [geometry setWantsAdaptiveSubdivision:NO];
-        [geometry setFirstMaterial:_meshMaterial];
-//      if( _matNode && _matNode.geometry.firstMaterial ){
-//        [geometry setFirstMaterial:_matNode.geometry.firstMaterial];
-//        _meshMaterial = _matNode.geometry.firstMaterial;
-//      } else {
-//        [geometry setFirstMaterial:_meshMaterial];
-//      }
-      [_meshNode setGeometry:geometry];
-//      _meshNode.physicsBody = [SCNPhysicsBody
-//                               bodyWithType:SCNPhysicsBodyTypeStatic
-//                               shape:[SCNPhysicsShape
-//                                      shapeWithGeometry:geometry
-//                                      options:@{
-//                                                SCNPhysicsShapeKeepAsCompoundKey: @TRUE,
-//                                                SCNPhysicsShapeTypeKey: SCNPhysicsShapeTypeConcavePolyhedron,
-//                                                }
-//                                      ]
-//                               ];
-
-      free(blockBuffer);
-      free(vertexBuffer);
-      free(faceBuffer);
-//      free(vertices);
-//      free(normals);
-    } else if (newVersion == 0 && _meshVersion > 0) {
-      _meshVersion = 0;
+          free(blockBuffer);
+          free(vertexBuffer);
+          free(faceBuffer);
+    //      free(vertices);
+    //      free(normals);
+        } else if (newVersion == 0 && _meshVersion > 0) {
+          _meshVersion = 0;
+        }
     }
   }
 //}

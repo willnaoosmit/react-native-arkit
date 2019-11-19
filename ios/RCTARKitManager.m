@@ -14,6 +14,8 @@
 #import <Photos/Photos.h>
 #import "color-grabber.h"
 
+#import <SixDegreesSDK/SixDegreesSDK.h>
+
 @implementation RCTARKitManager
 
 RCT_EXPORT_MODULE()
@@ -21,6 +23,7 @@ RCT_EXPORT_MODULE()
 
 
 - (UIView *)view {
+    
     return [ARKit sharedInstance];
 }
 
@@ -241,6 +244,17 @@ RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
             @"path": path,
         });
     }];
+}
+
+
+RCT_EXPORT_METHOD(stopSixDegrees:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    bool status = SixDegreesSDK_Stop();
+    if (status == true) {
+        resolve(@{});
+    } else {
+        reject(@"snapshot_error", @"Could not store snapshot", @"idk");
+    }
 }
 
 
