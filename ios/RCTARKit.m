@@ -9,7 +9,7 @@
 #import "RCTARKit.h"
 #import "RCTConvert+ARKit.h"
 
-#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
+#import <SixDegreesSDK/SixDegreesSDK.h>
 
 @import CoreLocation;
 
@@ -50,10 +50,10 @@ static RCTARKit *instance = nil;
 
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-//          RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
+          RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
           ARSCNView *arView = [[ARSCNView alloc] init];
-          //instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
-          instance = [[self alloc] initWithARView:arView];
+          instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
+//          instance = [[self alloc] initWithARView:arView];
         }
     });
 

@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) SCNNode* matNode;
 @property (readonly) SCNMaterial* meshMaterial;
 @property (readonly) int meshVersion;
+@property (readonly) SCNMaterial* normalsMaterial;
 
 + (instancetype)sharedInstance;
 

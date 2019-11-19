@@ -12,7 +12,7 @@
 #import "RCTARKitSixDegreesPlaneController.h"
 
 #import <SixDegreesSDK/SixDegreesSDK.h>
-#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
+//#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
 
 
 @implementation RCTARKitSixDegreesManager
@@ -68,6 +68,7 @@
   char location[16];
   location[0] = '\0';
   SixDegreesSDK_GetLocationId(location, 16);
+//    NSLog(@"onFrameUpdate: %@", [NSString stringWithUTF8String:location]);
 }
 
 @end
