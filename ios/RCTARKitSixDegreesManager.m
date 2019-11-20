@@ -12,6 +12,10 @@
 #import "RCTARKitSixDegreesPlaneController.h"
 
 #import <SixDegreesSDK/SixDegreesSDK.h>
+#import "RCTARKitIO.h"
+#import "RCTARKitManager.h"
+#import "RCTARKit.h"
+#import "RCTARKitNodes.h"
 //#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
 
 
@@ -54,7 +58,10 @@
 
 // Currently just using this as a polling loop
 - (void)drawInMTKView:(nonnull MTKView *)view {
-  if ([ARKit sharedInstance]) {
+//    if (!SixDegreesSDK_IsInitialized()) {
+//      return;
+//    }
+  if ([[ARKit sharedInstance] useSixDegreesSDK] == FALSE) {
     return;
   }
   [self onFrameUpdate];
