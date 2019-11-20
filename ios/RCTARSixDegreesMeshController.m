@@ -112,11 +112,7 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
 
 - (void)update {
     BOOL isCapturing = [[ARKit sharedInstance] useSixDegreesSDK];
-    if (isCapturing) {
-        NSLog(@"ISCAPTURING");
-    } else {
-        NSLog(@"not capturing");
-    }
+    // this isnt doing what I want.... but idk how else ot handle it.  @gtfargo
     if (isCapturing) {
         int blockBufferSize = 0;
         int vertexBufferSize = 0;
@@ -144,7 +140,7 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
           if (blockCount != blockBufferSize / 6) {
             NSLog(@"SixDegreesSDK_GetMeshBlocks() returned %d full blocks, expected %d", blockCount, (blockBufferSize / 6));
           }
-
+        
           _meshVersion = newVersion;
 
           int vertexCount = vertexBufferSize / 6;
@@ -204,6 +200,8 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
         } else if (newVersion == 0 && _meshVersion > 0) {
           _meshVersion = 0;
         }
+    } else {
+        _meshVersion = 0;
     }
   }
 //}

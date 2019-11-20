@@ -237,9 +237,6 @@ RCT_EXPORT_METHOD(
 RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
     [[RCTARKitIO sharedInstance] saveScene:[[RCTARKit sharedInstance] scene] as:@"test.obj" finishHandler:^(NSString *filename, NSString *path) {
-        NSLog(@"save happening?");
-        NSLog(@"%@", filename);
-        NSLog(@"%@", path);
         resolve(@{
             @"path": path,
         });
