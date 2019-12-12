@@ -39,14 +39,13 @@ void dispatch_once_on_main_thread(dispatch_once_t *predicate,
 
 @implementation RCTARKit
 static RCTARKit *instance = nil;
+static dispatch_once_t onceToken;
 
 + (bool)isInitialized {
     return instance !=nil;
 }
 
 + (instancetype)sharedInstance {
-
-    static dispatch_once_t onceToken;
 
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
@@ -60,6 +59,14 @@ static RCTARKit *instance = nil;
 
     return instance;
 }
+
++ (void) hardReset{
+    @synchronized(self) {
+        instance = nil;
+        oncePredicate = 0;
+    }
+}
+
 
 - (bool)isMounted {
 
