@@ -7,6 +7,7 @@
 //
 
 #import "RCTARKitManager.h"
+#import "RCTARSixDegreesMeshController.h"
 #import "RCTARKit.h"
 #import "RCTARKitNodes.h"
 #import "RCTARKitIO.h"
@@ -187,6 +188,8 @@ RCT_EXPORT_VIEW_PROPERTY(onARKitError, RCTBubblingEventBlock)
 
 RCT_EXPORT_METHOD(hardReset:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     [ARKit hardReset];
+    [RCTARSixDegreesMeshController hardReset];
+
     resolve(@{});
 }
 

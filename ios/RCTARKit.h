@@ -23,6 +23,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 
 + (instancetype)sharedInstance;
 + (bool)isInitialized;
++ (void) hardReset;
 - (instancetype)initWithARView:(ARSCNView *)arView;
 - (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView;
 //- (void)hitTestPlane:(CGPoint)tapPoint types:(ARHitTestResultType)types resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject;

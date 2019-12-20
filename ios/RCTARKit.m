@@ -39,6 +39,8 @@ void dispatch_once_on_main_thread(dispatch_once_t *predicate,
 
 @implementation RCTARKit
 static RCTARKit *instance = nil;
+static RCTARKitSixDegreesManager *sixDegressManager = nil;
+static ARSCNView *arView = nil;
 static dispatch_once_t onceToken;
 
 + (bool)isInitialized {
@@ -49,8 +51,8 @@ static dispatch_once_t onceToken;
 
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-          RCTARKitSixDegreesManager *sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
-          ARSCNView *arView = [[ARSCNView alloc] init];
+          sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
+          arView = [[ARSCNView alloc] init];
           instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
         
 //          instance = [[self alloc] initWithARView:arView];
@@ -62,8 +64,12 @@ static dispatch_once_t onceToken;
 
 + (void) hardReset{
     @synchronized(self) {
+        SixDegreesSDK_Stop();
         instance = nil;
-        oncePredicate = 0;
+        sixDegressManager = nil;
+        arView = nil;
+        onceToken = 0;
+        [[RCTARKit sharedInstance] reset];
     }
 }
 

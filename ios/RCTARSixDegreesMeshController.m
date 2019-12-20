@@ -57,16 +57,23 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
   resolve(nil);
 }
 
-+ (instancetype)sharedInstance {
-  static RCTARSixDegreesMeshController *instance = nil;
-  static dispatch_once_t onceToken;
+static RCTARSixDegreesMeshController *instance = nil;
+static dispatch_once_t onceToken;
 
++ (instancetype)sharedInstance {
   dispatch_once(&onceToken, ^{
     if (instance == nil) {
       instance = [[self alloc] init];
     }
   });
   return instance;
+}
+
++ (void) hardReset{
+    @synchronized(self) {
+        instance = nil;
+        onceToken = 0;
+    }
 }
 
 

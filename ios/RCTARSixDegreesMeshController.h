@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) SCNMaterial* normalsMaterial;
 
 + (instancetype)sharedInstance;
++ (void) hardReset;
 
 - (void)update;
 - (SCNNode*) node;
