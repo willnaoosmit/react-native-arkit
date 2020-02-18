@@ -13,7 +13,7 @@
 #import "RCTConvert+ARKit.h"
 
 #import <SixDegreesSDK/SixDegreesSDK.h>
-
+#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
 
 @interface RCTARKitSixDegreesPlaneController () {
   ARSession* _arSession;

@@ -11,12 +11,13 @@
 #import "RCTARSixDegreesMeshController.h"
 #import "RCTARKitSixDegreesPlaneController.h"
 
-#import <SixDegreesSDK/SixDegreesSDK.h>
 #import "RCTARKitIO.h"
 #import "RCTARKitManager.h"
 #import "RCTARKit.h"
 #import "RCTARKitNodes.h"
-//#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
+
+#import <SixDegreesSDK/SixDegreesSDK.h>
+#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
 
 
 @implementation RCTARKitSixDegreesManager

@@ -10,6 +10,7 @@
 #import "RCTConvert+ARKit.h"
 
 #import <SixDegreesSDK/SixDegreesSDK.h>
+#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
 
 @import CoreLocation;
 
@@ -64,7 +65,7 @@ static dispatch_once_t onceToken;
 
 + (void) hardReset{
     @synchronized(self) {
-        SixDegreesSDK_Stop();
+//        SixDegreesSDK_Stop();
         instance = nil;
         sixDegressManager = nil;
         arView = nil;

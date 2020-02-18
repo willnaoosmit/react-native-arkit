@@ -252,15 +252,15 @@ RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
 }
 
 
-RCT_EXPORT_METHOD(stopSixDegrees:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
-    bool status = SixDegreesSDK_Stop();
-    if (status == true) {
-        resolve(@{});
-    } else {
-        reject(@"snapshot_error", @"Could not store snapshot", @"idk");
-    }
-}
+//RCT_EXPORT_METHOD(stopSixDegrees:(RCTPromiseResolveBlock)resolve
+//                  reject:(RCTPromiseRejectBlock)reject) {
+////    bool status = SixDegreesSDK_Stop();
+//    if (status == true) {
+//        resolve(@{});
+//    } else {
+//        reject(@"snapshot_error", @"Could not store snapshot", @"idk");
+//    }
+//}
 
 
 
