@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   s.source         = { :git => "https://github.com/react-native-ar/react-native-arkit"", :tag => #{s.version}" }
   s.source_files   = '**/*.{h,m*}'
   s.preserve_paths = "**/*.js"
-  s.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '$(PODS_ROOT)/../Frameworks' }
+  s.xcconfig       = { 'FRAMEWORK_SEARCH_PATHS' => '$(PODS_ROOT)/../Frameworks', 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
+  s.libraries      = 'xml2'
   s.dependency 'React'
 end
