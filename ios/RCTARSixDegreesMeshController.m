@@ -124,7 +124,9 @@ static dispatch_once_t onceToken;
         int blockBufferSize = 0;
         int vertexBufferSize = 0;
         int faceBufferSize = 0;
-        int newVersion = SixDegreesSDK_GetMeshBlockInfo(&blockBufferSize, &vertexBufferSize, &faceBufferSize);
+        int newVersion = SixDegreesSDK_GetBlockMeshInfo(&blockBufferSize,   &vertexBufferSize, &faceBufferSize);
+        
+
 
         if (newVersion > _meshVersion) {
           if (blockBufferSize <= 0 ||
@@ -136,8 +138,8 @@ static dispatch_once_t onceToken;
           int* blockBuffer = (int*)malloc(blockBufferSize*sizeof(int));
           float* vertexBuffer = (float*)malloc(vertexBufferSize*sizeof(float));
           int* faceBuffer = (int*)malloc(faceBufferSize*sizeof(int));
-
-          int blockCount = SixDegreesSDK_GetMeshBlocks(blockBuffer, vertexBuffer, faceBuffer,
+        
+          int blockCount = SixDegreesSDK_GetBlockMesh(blockBuffer, vertexBuffer, faceBuffer,
                                                        blockBufferSize, vertexBufferSize, faceBufferSize);
           if (blockCount <= 0) {
             NSLog(@"SixDegreesSDK_GetMeshBlocks() gave us an empty mesh, will not update.");

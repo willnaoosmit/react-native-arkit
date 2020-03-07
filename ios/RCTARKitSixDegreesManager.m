@@ -17,7 +17,7 @@
 #import "RCTARKitNodes.h"
 
 #import <SixDegreesSDK/SixDegreesSDK.h>
-#import <SixDegreesSDK/SixDegreesSDK_advanced.h>
+#import <SixDegreesSDK/SixDegreesSDK_premium.h>
 
 
 @implementation RCTARKitSixDegreesManager
