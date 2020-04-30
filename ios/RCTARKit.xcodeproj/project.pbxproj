@@ -15,9 +15,6 @@
 		10ED47A71F38BC01004DF043 /* DeviceMotion.m in Sources */ = {isa = PBXBuildFile; fileRef = 10ED47A61F38BC00004DF043 /* DeviceMotion.m */; };
 		10FEF6141F774C9000EC21AE /* RCTARKitIO.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FEF6101F774C8F00EC21AE /* RCTARKitIO.m */; };
 		10FEF6151F774C9000EC21AE /* RCTARKitNodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FEF6121F774C9000EC21AE /* RCTARKitNodes.m */; };
-		A55A98CE21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A55A98CD21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.m */; };
-		A55A992821EF960400D3BF68 /* RCTARSixDegreesMeshController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55A992721EF960400D3BF68 /* RCTARSixDegreesMeshController.m */; };
-		A55C850721F12E0600355B8E /* RCTARKitSixDegreesPlaneController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55C850621F12E0600355B8E /* RCTARKitSixDegreesPlaneController.m */; };
 		B1990B221FCEEBD60001AE2F /* color-grabber.m in Sources */ = {isa = PBXBuildFile; fileRef = B1990B211FCEEBD60001AE2F /* color-grabber.m */; };
 		B1CEA29F204C14090025C1B8 /* RCTARKitSpriteView.m in Sources */ = {isa = PBXBuildFile; fileRef = B1CEA29E204C14090025C1B8 /* RCTARKitSpriteView.m */; };
 		B1CEA2A3204C160D0025C1B8 /* RCTARKitSpriteViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B1CEA2A2204C160D0025C1B8 /* RCTARKitSpriteViewManager.m */; };
@@ -64,12 +61,6 @@
 		10FEF6121F774C9000EC21AE /* RCTARKitNodes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTARKitNodes.m; sourceTree = "<group>"; };
 		10FEF6131F774C9000EC21AE /* RCTARKitDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTARKitDelegate.h; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libRCTARKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTARKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		A55A98CC21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTARKitSixDegreesManager.h; sourceTree = "<group>"; };
-		A55A98CD21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTARKitSixDegreesManager.m; sourceTree = "<group>"; };
-		A55A992621EF960400D3BF68 /* RCTARSixDegreesMeshController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTARSixDegreesMeshController.h; sourceTree = "<group>"; };
-		A55A992721EF960400D3BF68 /* RCTARSixDegreesMeshController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTARSixDegreesMeshController.m; sourceTree = "<group>"; };
-		A55C850521F12E0600355B8E /* RCTARKitSixDegreesPlaneController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTARKitSixDegreesPlaneController.h; sourceTree = "<group>"; };
-		A55C850621F12E0600355B8E /* RCTARKitSixDegreesPlaneController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTARKitSixDegreesPlaneController.m; sourceTree = "<group>"; };
 		A5B531F2213769DF00B8A1F5 /* SCNLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCNLine.h; sourceTree = "<group>"; };
 		B14C36631F960C500047CB67 /* PocketSVG.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PocketSVG.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B14C36651F960C6E0047CB67 /* PocketSVG.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PocketSVG.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,12 +128,6 @@
 				10062C821F127572009AE974 /* RCTARKitManager.m */,
 				105F124C1F7C0718006D4BA3 /* RCTConvert+ARKit.h */,
 				105F124D1F7C0718006D4BA3 /* RCTConvert+ARKit.m */,
-				A55A98CC21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.h */,
-				A55A98CD21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.m */,
-				A55A992621EF960400D3BF68 /* RCTARSixDegreesMeshController.h */,
-				A55A992721EF960400D3BF68 /* RCTARSixDegreesMeshController.m */,
-				A55C850521F12E0600355B8E /* RCTARKitSixDegreesPlaneController.h */,
-				A55C850621F12E0600355B8E /* RCTARKitSixDegreesPlaneController.m */,
 				A5B531F2213769DF00B8A1F5 /* SCNLine.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				B13FF7601F94F72400A6C92B /* Frameworks */,
@@ -228,15 +213,12 @@
 				10DCBC4B1F7CE836008C89E7 /* ARGeosManager.m in Sources */,
 				10FEF6151F774C9000EC21AE /* RCTARKitNodes.m in Sources */,
 				B1990B221FCEEBD60001AE2F /* color-grabber.m in Sources */,
-				A55A992821EF960400D3BF68 /* RCTARSixDegreesMeshController.m in Sources */,
 				1021FE1C1F3EDB98000E7339 /* ARModelManager.m in Sources */,
 				1021FE1D1F3EDB9B000E7339 /* ARTextManager.m in Sources */,
 				105F124E1F7C0719006D4BA3 /* RCTConvert+ARKit.m in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RCTARKit.m in Sources */,
 				10062C831F127572009AE974 /* RCTARKitManager.m in Sources */,
-				A55A98CE21EE8F7000D3BF68 /* RCTARKitSixDegreesManager.m in Sources */,
 				B1CEA29F204C14090025C1B8 /* RCTARKitSpriteView.m in Sources */,
-				A55C850721F12E0600355B8E /* RCTARKitSixDegreesPlaneController.m in Sources */,
 				B1CEA2A3204C160D0025C1B8 /* RCTARKitSpriteViewManager.m in Sources */,
 				10ED47A71F38BC01004DF043 /* DeviceMotion.m in Sources */,
 			);

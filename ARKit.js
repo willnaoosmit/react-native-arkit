@@ -217,7 +217,6 @@ ARKit.pickColors = pickColors;
 ARKit.pickColorsFromFile = pickColorsFromFile;
 ARKit.propTypes = {
   debug: PropTypes.bool,
-  useSixDegreesSDK: PropTypes.bool,
   planeDetection,
   origin: PropTypes.shape({
     position,

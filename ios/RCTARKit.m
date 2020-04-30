@@ -9,8 +9,6 @@
 #import "RCTARKit.h"
 #import "RCTConvert+ARKit.h"
 
-#import <SixDegreesSDK/SixDegreesSDK.h>
-
 @import CoreLocation;
 
 @interface RCTARKit () <ARSCNViewDelegate, ARSessionDelegate, UIGestureRecognizerDelegate> {
@@ -39,7 +37,6 @@ void dispatch_once_on_main_thread(dispatch_once_t *predicate,
 
 @implementation RCTARKit
 static RCTARKit *instance = nil;
-static RCTARKitSixDegreesManager *sixDegressManager = nil;
 static ARSCNView *arView = nil;
 static dispatch_once_t onceToken;
 
@@ -51,11 +48,8 @@ static dispatch_once_t onceToken;
 
     dispatch_once_on_main_thread(&onceToken, ^{
         if (instance == nil) {
-          sixDegressManager = [[RCTARKitSixDegreesManager alloc] init];
           arView = [[ARSCNView alloc] init];
-          instance = [[self alloc] initWithSixDegreesView:sixDegressManager arView:arView];
-        
-//          instance = [[self alloc] initWithARView:arView];
+         instance = [[self alloc] initWithARView:arView];
         }
     });
 
@@ -64,9 +58,7 @@ static dispatch_once_t onceToken;
 
 + (void) hardReset{
     @synchronized(self) {
-        SixDegreesSDK_Stop();
         instance = nil;
-        sixDegressManager = nil;
         arView = nil;
         onceToken = 0;
         [[RCTARKit sharedInstance] reset];
@@ -77,55 +69,6 @@ static dispatch_once_t onceToken;
 - (bool)isMounted {
 
     return self.superview != nil;
-}
-
-- (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView {
-  if ((self = [super init])) {
-
-//    self.useSixDegreesSDK = YES;
-    self.sixDegressManager = sixDegreesView;
-    [self addSubview:self.sixDegressManager];
-
-    // Wait for 6d to get the ARSession
-    ARSession* sixSession = SixDegreesSDK_GetARKitSession();
-    int watchdog = 0;
-    while( sixSession == nil && watchdog++ < 3000 ) {
-      // Let 6D get the ARKit session going
-      [NSThread sleepForTimeInterval:0.1];
-      sixSession = SixDegreesSDK_GetARKitSession();
-    }
-    // Now that 6D is up and running, get the ARSession and configure our ARSCNView
-    [self setSession:sixSession];
-    self.arView = arView;
-    [self.arView setSession:sixSession];
-
-//    self.arView.delegate = self;
-//    self.arView.session.delegate = self;
-
-    // configuration(s)
-    self.arView.scene.rootNode.name = @"root";
-    self.arView.autoenablesDefaultLighting = YES;
-
-    [self.arView setBackgroundColor:[UIColor clearColor]];
-
-    self.touchDelegates = [NSMutableArray array];
-    self.rendererDelegates = [NSMutableArray array];
-    self.sessionDelegates = [NSMutableArray array];
-
-    // nodeManager
-    self.nodeManager = [RCTARKitNodes sharedInstance];
-    [self.sessionDelegates addObject:self.nodeManager];
-    self.nodeManager.arView = self.arView;
-
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
-    tapGestureRecognizer.numberOfTapsRequired = 1;
-    [self.arView addGestureRecognizer:tapGestureRecognizer];
-
-
-    [self addSubview:self.arView];
-    [self resume];
-  }
-  return self;
 }
 
 // This is the old regular react-native-arkit init
@@ -284,19 +227,6 @@ static dispatch_once_t onceToken;
     ARConfiguration *configuration = self.configuration;
     return configuration.lightEstimationEnabled;
 }
-
-//- (BOOL)useSixDegreesSDK {
-//
-//}
-
-//- (void)setUseSixDegreesSDK:(BOOL)useSixDegreesSDK {
-//    BOOL flag = useSixDegreesSDK;
-//    NSLog(flag ? @"Yes" : @"No");
-//    if (self.useSixDegreesSDK == useSixDegreesSDK) {
-//        return;
-//    }
-//    self.useSixDegreesSDK = useSixDegreesSDK;
-//}
 
 - (void)setLightEstimationEnabled:(BOOL)lightEstimationEnabled {
     ARConfiguration *configuration = self.configuration;

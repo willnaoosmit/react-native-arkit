@@ -10,8 +10,6 @@
 #import <SceneKit/SceneKit.h>
 #import <ARKit/ARKit.h>
 
-#import "RCTARKitSixDegreesManager.h"
-#import "RCTARKitDelegate.h"
 #import "RCTARKitNodes.h"
 
 typedef void (^RCTBubblingEventBlock)(NSDictionary *body);
@@ -25,7 +23,6 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 + (bool)isInitialized;
 + (void) hardReset;
 - (instancetype)initWithARView:(ARSCNView *)arView;
-- (instancetype)initWithSixDegreesView:(RCTARKitSixDegreesManager *)sixDegreesView arView:(ARSCNView *)arView;
 //- (void)hitTestPlane:(CGPoint)tapPoint types:(ARHitTestResultType)types resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject;
 
 
@@ -36,11 +33,9 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 
 #pragma mark - Properties
 @property (nonatomic, strong) ARSCNView *arView;
-@property (nonatomic, strong) RCTARKitSixDegreesManager *sixDegressManager;
 @property (nonatomic, strong) RCTARKitNodes *nodeManager;
 
 @property (nonatomic, assign) BOOL debug;
-@property (nonatomic, assign) BOOL useSixDegreesSDK;
 @property (nonatomic, assign) ARPlaneDetection planeDetection;
 @property (nonatomic, assign) BOOL lightEstimationEnabled;
 @property (nonatomic, assign) BOOL autoenablesDefaultLighting;

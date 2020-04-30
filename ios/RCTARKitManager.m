@@ -7,7 +7,6 @@
 //
 
 #import "RCTARKitManager.h"
-#import "RCTARSixDegreesMeshController.h"
 #import "RCTARKit.h"
 #import "RCTARKitNodes.h"
 #import "RCTARKitIO.h"
@@ -15,7 +14,6 @@
 #import <Photos/Photos.h>
 #import "color-grabber.h"
 
-#import <SixDegreesSDK/SixDegreesSDK.h>
 
 @implementation RCTARKitManager
 
@@ -162,7 +160,6 @@ RCT_EXPORT_MODULE()
 }
 
 RCT_EXPORT_VIEW_PROPERTY(debug, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(useSixDegreesSDK, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(planeDetection, ARPlaneDetection)
 RCT_EXPORT_VIEW_PROPERTY(origin, NSDictionary *)
 RCT_EXPORT_VIEW_PROPERTY(lightEstimationEnabled, BOOL)
@@ -188,8 +185,6 @@ RCT_EXPORT_VIEW_PROPERTY(onARKitError, RCTBubblingEventBlock)
 
 RCT_EXPORT_METHOD(hardReset:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     [ARKit hardReset];
-    [RCTARSixDegreesMeshController hardReset];
-
     resolve(@{});
 }
 
@@ -249,17 +244,6 @@ RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
             @"path": path,
         });
     }];
-}
-
-
-RCT_EXPORT_METHOD(stopSixDegrees:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
-    bool status = SixDegreesSDK_Stop();
-    if (status == true) {
-        resolve(@{});
-    } else {
-        reject(@"snapshot_error", @"Could not store snapshot", @"idk");
-    }
 }
 
 

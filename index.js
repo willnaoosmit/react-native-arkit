@@ -17,8 +17,6 @@ import ARPlane from './components/ARPlane';
 import ARPyramid from './components/ARPyramid';
 import ARShape from './components/ARShape';
 import ARLine from './components/ARLine';
-import ARSixDegreesMesh from './components/ARSixDegreesMesh';
-import ARSixDegreesPlane from './components/ARSixDegreesPlane';
 import ARSphere from './components/ARSphere';
 import ARSprite from './components/ARSprite';
 import ARText from './components/ARText';
@@ -45,8 +43,6 @@ ARKit.Sprite = ARSprite;
 ARKit.Group = ARGroup;
 ARKit.Shape = ARShape;
 ARKit.Line = ARLine;
-ARKit.ARSixDegreesMesh = ARSixDegreesMesh;
-ARKit.ARSixDegreesPlane = ARSixDegreesPlane;
 ARKit.Light = ARLight;
 
 startup();

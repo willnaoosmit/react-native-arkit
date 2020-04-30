@@ -2,18 +2,6 @@
 
 ⚠️  **This is the readme from the current development. If you want to see the readme from the latest release, see https://github.com/HippoAR/react-native-arkit/releases**
 
-## Using 6D.ai
-
-- Go get your SixDegreesSDK.framework from [6D.ai](http://6d.ai)
-- In your ReactNativeProjectApp make a `Frameworks` dir at:
-
-```
-ReactNativeProjectApp/ios/Frameworks/
-```
-
-Put `SixDegreesSDK.framework` in there. Make sure you install your `SixDegreesSDK.plist` as part of your install steps.
-
-
 [![npm version](https://img.shields.io/npm/v/react-native-arkit.svg?style=flat)](https://www.npmjs.com/package/react-native-arkit)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-arkit.svg?style=flat)](https://www.npmjs.com/package/react-native-arkit)
 
