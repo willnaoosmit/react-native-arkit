@@ -2,8 +2,6 @@
 
 ⚠️  **This is the readme from the current development. If you want to see the readme from the latest release, see https://github.com/HippoAR/react-native-arkit/releases**
 
-
-
 [![npm version](https://img.shields.io/npm/v/react-native-arkit.svg?style=flat)](https://www.npmjs.com/package/react-native-arkit)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-arkit.svg?style=flat)](https://www.npmjs.com/package/react-native-arkit)
 
@@ -407,6 +405,7 @@ Most objects take a material property with these sub-props:
 | Prop | Type | Description |
 |---|---|---|
 | `diffuse` | `{ ...mapProperties }` (see below) | [diffuse](https://developer.apple.com/documentation/scenekit/scnmaterial/1462589-diffuse?language=objc)
+| `ambient` | `{ ...mapProperties }` (see below) | [ambient](https://developer.apple.com/documentation/scenekit/scnmaterial/1462558-ambient?language=objc)
 | `specular` | `{ ...mapProperties }` (see below) | [specular](https://developer.apple.com/documentation/scenekit/scnmaterial/1462516-specular?language=objc)
 | `displacement` | `{ ...mapProperties }` (see below) | [displacement](https://developer.apple.com/documentation/scenekit/scnmaterial/2867516-displacement?language=objc)
 | `normal` | `{ ...mapProperties }` (see below) |  [normal](https://developer.apple.com/documentation/scenekit/scnmaterial/1462542-normal)

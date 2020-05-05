@@ -113,6 +113,7 @@ class ARKit extends Component {
     state = this.state.state,
     reason = this.state.reason,
   }) => {
+    console.log('tracking in arkit.js')
     if (this.props.onTrackingState) {
       this.props.onTrackingState({
         state: TRACKING_STATES[state] || state,

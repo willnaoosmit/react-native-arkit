@@ -66,7 +66,7 @@ CGFloat focDistance = 0.2f;
 }
 
 - (void)setArView:(ARSCNView *)arView {
-    //NSLog(@"setArView");
+    NSLog(@"setArView");
     _arView = arView;
     self.rootNode = arView.scene.rootNode;
     
@@ -75,6 +75,18 @@ CGFloat focDistance = 0.2f;
     [self.rootNode addChildNode:self.localOrigin];
     [self.rootNode addChildNode:self.cameraOrigin];
     [self.rootNode addChildNode:self.frontOfCamera];
+}
+
+- (void)setArScene:(SCNScene *)arScene {
+  NSLog(@"setArView");
+  _arScene = arScene;
+  self.rootNode = _arScene.rootNode;
+
+  self.rootNode.name = @"root";
+
+  [self.rootNode addChildNode:self.localOrigin];
+  [self.rootNode addChildNode:self.cameraOrigin];
+  [self.rootNode addChildNode:self.frontOfCamera];
 }
 
 #pragma mark
@@ -86,7 +98,7 @@ CGFloat focDistance = 0.2f;
  add a node to scene on a frame (defaults to Local) or to a parentNode (if parentId is given)
  */
 - (void)addNodeToScene:(SCNNode *)node inReferenceFrame:(NSString *)referenceFrame withParentId:(NSString *)parentId  {
-    //NSLog(@"addNodeToScene node: %@ ", node.name);
+    NSLog(@"addNodeToScene node: %@ ", node.name);
     if(parentId) {
         [self addNodeToParent:node parentId:parentId];
     } else {
@@ -174,6 +186,7 @@ CGFloat focDistance = 0.2f;
 
 
 - (NSDictionary *)getSceneObjectsHitResult:(const CGPoint)tapPoint  {
+  if( _arView ){
     NSDictionary *options = @{
                               SCNHitTestRootNodeKey: self.localOrigin,
                               SCNHitTestSortResultsKey: @(YES),
@@ -184,6 +197,8 @@ CGFloat focDistance = 0.2f;
     NSMutableArray * resultsMapped = [self mapHitResultsWithSceneResults:results];
     NSDictionary *result = getSceneObjectHitResult(resultsMapped, tapPoint);
     return result;
+  }
+  return nil;
 }
 
 
@@ -371,12 +386,16 @@ static id ObjectOrNull(id object)
 - (void) setChildrenMaterial:(SCNNode*)node
                   properties:(NSDictionary *) properties {
   bool setMaterial = false;
+  for (id material in node.geometry.materials) {
+    [RCTConvert setMaterialProperties:material properties:properties[@"material"]];
+  }
   for (SCNNode* child in node.childNodes) {
-    for (id material in child.geometry.materials) {
+    for (SCNMaterial* material in child.geometry.materials) {
+      NSLog(@"setting material: %@", [material name]);
       [RCTConvert setMaterialProperties:material properties:properties[@"material"]];
       setMaterial = true;
     }
-    if( !setMaterial ){
+    if( !setMaterial && child.childNodes && child.childNodes.count > 0 ){
       [self setChildrenMaterial:child properties:properties];
     }
   }
@@ -386,7 +405,7 @@ static id ObjectOrNull(id object)
         properties:(NSDictionary *) properties {
     
     SCNNode *node = [self getNodeWithId:nodeId];
-    // NSLog(@"updating node %@ :%@", nodeId, properties);
+     NSLog(@"updating node %@ :%@", nodeId, properties);
     if(node) {
         [RCTConvert setNodeProperties:node properties:properties];
         if(node.geometry && properties[@"shape"]) {

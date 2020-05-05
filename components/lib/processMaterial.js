@@ -2,7 +2,7 @@ import { processColor } from 'react-native';
 import { isObject, isString, mapValues, set } from 'lodash';
 
 // https://developer.apple.com/documentation/scenekit/scnmaterial
-const propsWithMaps = ['normal', 'diffuse', 'displacement', 'specular'];
+const propsWithMaps = ['normal', 'diffuse', 'ambient', 'displacement', 'specular'];
 
 export default function processMaterial(materialOrg) {
   const material = { ...materialOrg };
@@ -20,6 +20,7 @@ export default function processMaterial(materialOrg) {
             color: processColor(
               // allow for setting a diffuse  colorstring { diffuse: 'colorstring'}
               key === 'diffuse' && isString(prop) ? prop : prop.color,
+              key === 'ambient' && isString(prop) ? prop : prop.color,
             ),
           }
         : prop,

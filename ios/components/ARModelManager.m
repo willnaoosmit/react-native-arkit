@@ -36,7 +36,8 @@ RCT_EXPORT_METHOD(mount:(NSDictionary *)property
 
         NSString *path = [NSString stringWithFormat:@"%@", model[@"file"]];
         //NSLog(@"mounting model: %@ %@", node.name, path);
-        SCNNode *modelNode = [[RCTARKitIO sharedInstance] loadModel:path nodeName:model[@"node"] withAnimation:YES];
+//        SCNNode *modelNode = [[RCTARKitIO sharedInstance] loadModel:path nodeName:model[@"node"] withAnimation:YES];
+        SCNNode *modelNode = [[RCTARKitIO sharedInstance] loadMDLModel:path nodeName:nil withAnimation:YES];
         modelNode.scale = SCNVector3Make(scale, scale, scale);
         // transfer some properties to modeNode like "castsShadow"
         modelNode.castsShadow = node.castsShadow;

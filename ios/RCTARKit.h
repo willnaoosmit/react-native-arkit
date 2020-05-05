@@ -10,7 +10,6 @@
 #import <SceneKit/SceneKit.h>
 #import <ARKit/ARKit.h>
 
-#import "RCTARKitDelegate.h"
 #import "RCTARKitNodes.h"
 
 typedef void (^RCTBubblingEventBlock)(NSDictionary *body);
@@ -22,7 +21,9 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 
 + (instancetype)sharedInstance;
 + (bool)isInitialized;
++ (void) hardReset;
 - (instancetype)initWithARView:(ARSCNView *)arView;
+//- (void)hitTestPlane:(CGPoint)tapPoint types:(ARHitTestResultType)types resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject;
 
 
 @property (nonatomic, strong) NSMutableArray<id<RCTARKitTouchDelegate>> *touchDelegates;
@@ -78,15 +79,17 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (UIImage *)getSnapshotCamera:(NSDictionary*)selection;
 - (void)focusScene;
 - (void)clearScene;
-- (void)moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId;
+- (void)moveNodeToCamera:(NSString *)nodeId;
 - (NSDictionary *)readCameraPosition;
 - (NSDictionary *)readCamera;
+- (NSDictionary *) projectAlongCamera: (NSDictionary*) nodeDict;
 - (NSDictionary* )getCurrentLightEstimation;
 - (NSArray * )getCurrentDetectedFeaturePoints;
 - (bool)isMounted;
 - (bool)getNodeVisibility:(NSString *)nodeId;
 - (void)addRendererDelegates:(id)delegate;
 - (void)removeRendererDelegates:(id)delegate;
+- (SCNScene*)scene;
 
 #pragma mark - Delegates
 - (void)renderer:(id <SCNSceneRenderer>)renderer didRenderScene:(SCNScene *)scene atTime:(NSTimeInterval)time;

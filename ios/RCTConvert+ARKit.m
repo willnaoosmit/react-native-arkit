@@ -469,6 +469,10 @@
     if (json[@"diffuse"]) {
         [self setMaterialPropertyContents:json[@"diffuse"] material:material.diffuse];
     }
+  
+    if (json[@"ambient"]) {
+      [self setMaterialPropertyContents:json[@"ambient"] material:material.ambient];
+    }
 
     if (json[@"normal"]) {
         [self setMaterialPropertyContents:json[@"normal"] material:material.normal];
@@ -526,7 +530,7 @@
 }
 
 + (void)setNodeProperties:(SCNNode *)node properties:(id)json {
-
+    
     if (json[@"categoryBitMask"]) {
         node.categoryBitMask = [json[@"categoryBitMask"] integerValue];
     }
@@ -552,9 +556,6 @@
     } else {
         [SCNTransaction setAnimationDuration:0.0];
     }
-    if (json[@"position"]) {
-        node.position = [self SCNVector3:json[@"position"]];
-    }
 
     if (json[@"scale"]) {
 
@@ -574,6 +575,10 @@
     if (json[@"rotation"]) {
         node.rotation = [self SCNVector4:json[@"rotation"]];
     }
+
+  if (json[@"position"]) {
+    node.position = [self SCNVector3:json[@"position"]];
+  }
 
     if (json[@"opacity"]) {
         node.opacity = [json[@"opacity"] floatValue];

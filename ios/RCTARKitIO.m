@@ -7,8 +7,6 @@
 //
 
 #import "RCTARKitIO.h"
-#import <ModelIO/ModelIO.h>
-#import <ModelIO/MDLAsset.h>
 #import <SceneKit/ModelIO.h>
 
 @implementation RCTARKitIO
@@ -77,20 +75,20 @@
 }
 
 
-
 - (SCNNode *)loadMDLModel:(NSString *)path nodeName:(NSString *)nodeName withAnimation:(BOOL)withAnimation {
     NSURL *url = [self urlFromPath:path];
     MDLAsset *asset = [[MDLAsset alloc] initWithURL:url];
-    SCNScene *scene = [SCNScene sceneWithMDLAsset:asset];
-    
+    [asset loadTextures];
+
     SCNNode *node;
     if (nodeName) {
+      SCNScene *scene = [SCNScene sceneWithMDLAsset:asset];
         node = [scene.rootNode childNodeWithName:nodeName recursively:YES];
     } else {
         node = [[SCNNode alloc] init];
-        NSArray *nodeArray = [scene.rootNode childNodes];
-        for (SCNNode *eachChild in nodeArray) {
-            [node addChildNode:eachChild];
+        for (int i = 0; i < asset.count; i++) {
+            MDLObject* child = [asset objectAtIndex:i];
+            [node addChildNode:[SCNNode nodeWithMDLObject:child]];
         }
     }
     

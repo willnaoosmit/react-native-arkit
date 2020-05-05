@@ -9,9 +9,11 @@
 #import "RCTARKitManager.h"
 #import "RCTARKit.h"
 #import "RCTARKitNodes.h"
+#import "RCTARKitIO.h"
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
 #import "color-grabber.h"
+
 
 @implementation RCTARKitManager
 
@@ -20,6 +22,7 @@ RCT_EXPORT_MODULE()
 
 
 - (UIView *)view {
+    
     return [ARKit sharedInstance];
 }
 
@@ -180,6 +183,11 @@ RCT_EXPORT_VIEW_PROPERTY(onTapOnPlaneNoExtent, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onEvent, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onARKitError, RCTBubblingEventBlock)
 
+RCT_EXPORT_METHOD(hardReset:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    [ARKit hardReset];
+    resolve(@{});
+}
+
 RCT_EXPORT_METHOD(pause:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     [[ARKit sharedInstance] pause];
     resolve(@{});
@@ -229,7 +237,14 @@ RCT_EXPORT_METHOD(
 }
 
 
-
+RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    [[RCTARKitIO sharedInstance] saveScene:[[RCTARKit sharedInstance] scene] as:@"test.obj" finishHandler:^(NSString *filename, NSString *path) {
+        resolve(@{
+            @"path": path,
+        });
+    }];
+}
 
 - (NSString *)getAssetUrl:(NSString *)localID {
     // thx https://stackoverflow.com/a/34788748/1463534
@@ -360,6 +375,10 @@ RCT_EXPORT_METHOD(getCamera:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRe
     resolve([[ARKit sharedInstance] readCamera]);
 }
 
+RCT_EXPORT_METHOD(projectAlongCamera:(NSDictionary *)nodeDict resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  resolve([[ARKit sharedInstance] projectAlongCamera:nodeDict]);
+}
+
 RCT_EXPORT_METHOD(getCameraPosition:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     resolve([[ARKit sharedInstance] readCameraPosition]);
 }
@@ -407,8 +426,8 @@ RCT_EXPORT_METHOD(checkNodeVisible:(NSString *)nodeId resolve:(RCTPromiseResolve
   resolve(@(nodeIsVisible));
 }
 
-RCT_EXPORT_METHOD(moveNodeToCamera:(NSString *)nodeId targetNodeId:(NSString *)targetNodeId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-  [[ARKit sharedInstance] moveNodeToCamera:nodeId targetNodeId:targetNodeId];
+RCT_EXPORT_METHOD(moveNodeToCamera:(NSString *)nodeId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  [[ARKit sharedInstance] moveNodeToCamera:nodeId];
   resolve(@{});
 }
 
