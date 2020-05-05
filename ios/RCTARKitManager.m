@@ -246,8 +246,6 @@ RCT_EXPORT_METHOD(saveScene:(RCTPromiseResolveBlock)resolve
     }];
 }
 
-
-
 - (NSString *)getAssetUrl:(NSString *)localID {
     // thx https://stackoverflow.com/a/34788748/1463534
     // heck, objective c is such a mess

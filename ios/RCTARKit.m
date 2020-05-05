@@ -542,6 +542,8 @@ static NSDictionary * vector4ToJson(const SCNVector4 v) {
     if (!ARWorldTrackingConfiguration.isSupported) {}
 
     _configuration = [ARWorldTrackingConfiguration new];
+    
+    _configuration.environmentTexturing = AREnvironmentTexturingAutomatic;
     _configuration.planeDetection = ARPlaneDetectionHorizontal;
     return _configuration;
 }
